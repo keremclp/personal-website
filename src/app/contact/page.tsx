@@ -5,15 +5,11 @@
 import React, { useState, useEffect } from "react";
 import { Send, MessageSquare, ShieldCheck, Mail, Sparkles, Check, ArrowRight } from "lucide-react";
 
-const CATEGORIES = ["SaaS Dashboard", "Marketing Landing Page", "E-commerce Storefront", "Full-Stack Development", "Consulting / Audit"];
-const BUDGETS = ["$1k - $3k", "$3k - $5k", "$5k - $10k", "$10k+"];
-
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    category: "SaaS Dashboard",
-    budget: "$3k - $5k",
+    category: "",
     message: "",
   });
 
@@ -49,7 +45,10 @@ export default function Contact() {
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          budget: "Not Specified",
+        }),
       });
 
       if (!response.ok) {
@@ -70,7 +69,7 @@ export default function Contact() {
       formData.name
     )}. I just submitted a project inquiry for a "${encodeURIComponent(
       formData.category
-    )}" project (Budget: ${encodeURIComponent(formData.budget)}).
+    )}" project.
 Brief: ${encodeURIComponent(formData.message)}
 
 Let's discuss my project!`;
@@ -207,45 +206,21 @@ Let's discuss my project!`;
                 </div>
               </div>
 
-              {/* Row: Project Category & Budget */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="category" className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Project Type
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl bg-brand-dark border border-brand-border text-white text-sm font-sans focus:outline-none focus:border-brand-purple transition-colors appearance-none"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="budget" className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Estimated Budget Range
-                  </label>
-                  <select
-                    id="budget"
-                    name="budget"
-                    value={formData.budget}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl bg-brand-dark border border-brand-border text-white text-sm font-sans focus:outline-none focus:border-brand-purple transition-colors appearance-none"
-                  >
-                    {BUDGETS.map((bud) => (
-                      <option key={bud} value={bud}>
-                        {bud}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Project Type Input */}
+              <div className="flex flex-col gap-2">
+                <label htmlFor="category" className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                  Project Type
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  name="category"
+                  required
+                  value={formData.category}
+                  onChange={handleChange}
+                  placeholder="e.g. SaaS Dashboard, E-commerce Web App, Mobile Design..."
+                  className="w-full px-4 py-3 rounded-xl bg-brand-dark border border-brand-border text-white text-sm font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                />
               </div>
 
               {/* Message Block */}
@@ -298,7 +273,7 @@ Let's discuss my project!`;
             </div>
             
             <p className="text-sm text-zinc-400 font-sans leading-relaxed">
-              Your inquiry for a <strong>{formData.category}</strong> (Budget: {formData.budget}) has been securely saved in our database.
+              Your inquiry for a <strong>{formData.category}</strong> has been securely saved in our database.
               <br /><br />
               To get a priority response and discuss your proposal instantly, click the button below to **message me directly on WhatsApp**!
             </p>
@@ -320,8 +295,7 @@ Let's discuss my project!`;
                   setFormData({
                     name: "",
                     email: "",
-                    category: "SaaS Dashboard",
-                    budget: "$3k - $5k",
+                    category: "",
                     message: "",
                   });
                 }}

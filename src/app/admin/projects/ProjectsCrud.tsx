@@ -22,9 +22,9 @@ interface ProjectsCrudProps {
 }
 
 const DEFAULT_IMAGES = [
-  { label: "AI SaaS Mockup", path: "/projects/ai-saas.png" },
-  { label: "Luxury E-Commerce Mockup", path: "/projects/luxury-ecommerce.png" },
-  { label: "Creative Agency Mockup", path: "/projects/creative-agency.png" },
+  { label: "AI Creative Mockup", path: "/projects/ai-app.png" },
+  { label: "Luxury Horology Mockup", path: "/projects/mobile-app.png" },
+  { label: "Predictive Analytics Mockup", path: "/projects/web-app.png" },
 ];
 
 export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
@@ -47,11 +47,11 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    imageUrl: "/projects/ai-saas.png",
+    imageUrl: "/projects/ai-app.png",
     techStack: "",
     liveLink: "",
     githubLink: "",
-    category: "SaaS",
+    category: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -62,11 +62,11 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
     setFormData({
       title: "",
       description: "",
-      imageUrl: "/projects/ai-saas.png",
+      imageUrl: "/projects/ai-app.png",
       techStack: "",
       liveLink: "",
       githubLink: "",
-      category: "SaaS",
+      category: "",
     });
     setError("");
     setIsModalOpen(true);
@@ -288,17 +288,16 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   <label htmlFor="category" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                     Display Category
                   </label>
-                  <select
+                  <input
+                    type="text"
                     id="category"
                     name="category"
+                    required
                     value={formData.category}
                     onChange={handleChange}
-                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors appearance-none"
-                  >
-                    <option value="SaaS">SaaS Dashboard</option>
-                    <option value="E-commerce">E-Commerce Storefront</option>
-                    <option value="Creative">Creative / Marketing</option>
-                  </select>
+                    placeholder="e.g. SaaS, E-commerce, Mobile, AI"
+                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                  />
                 </div>
               </div>
 
@@ -331,7 +330,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   required
                   value={formData.imageUrl}
                   onChange={handleChange}
-                  placeholder="e.g. /projects/ai-saas.png"
+                  placeholder="e.g. https://images.unsplash.com/... or /projects/ai-app.png"
                   className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
                 />
                 

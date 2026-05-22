@@ -21,11 +21,36 @@ interface PortfolioClientProps {
   initialProjects: Project[];
 }
 
-const CATEGORIES = ["All", "SaaS", "E-commerce", "Creative"];
-
 export default function PortfolioClient({ initialProjects }: PortfolioClientProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // Dynamically extract unique categories from the database entries, preventing casing duplication
+  const dynamicCategories = React.useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueCategories: string[] = [];
+    initialProjects.forEach((project) => {
+      if (project.category) {
+        const trimmed = project.category.trim();
+        const lower = trimmed.toLowerCase();
+        if (!seen.has(lower)) {
+          seen.add(lower);
+          uniqueCategories.push(trimmed);
+        }
+      }
+    });
+    return ["All", ...uniqueCategories];
+  }, [initialProjects]);
+
+  // Reset selected category to "All" if it gets deleted or is no longer present in dynamic list
+  useEffect(() => {
+    const exists = dynamicCategories.some(
+      (cat) => cat.toLowerCase() === selectedCategory.toLowerCase()
+    );
+    if (!exists) {
+      setSelectedCategory("All");
+    }
+  }, [dynamicCategories, selectedCategory]);
 
   // Lock body scroll when modal is open for a premium micro-UX experience
   useEffect(() => {
@@ -39,24 +64,24 @@ export default function PortfolioClient({ initialProjects }: PortfolioClientProp
     };
   }, [selectedProject]);
 
-  // Filter projects by category
+  // Filter projects by category (case-insensitive)
   const filteredProjects =
-    selectedCategory === "All"
+    selectedCategory.toLowerCase() === "all"
       ? initialProjects
       : initialProjects.filter(
-          (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
+          (p) => p.category.trim().toLowerCase() === selectedCategory.toLowerCase()
         );
 
   return (
     <div className="w-full flex flex-col gap-12 relative">
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-3 pb-4 border-b border-brand-border">
-        {CATEGORIES.map((category) => (
+        {dynamicCategories.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase transition-all ${
-              selectedCategory === category
+              selectedCategory.toLowerCase() === category.toLowerCase()
                 ? "bg-gradient-to-r from-brand-purple to-brand-cyan text-white shadow-lg shadow-brand-purple/20"
                 : "bg-white/5 border border-brand-border text-zinc-400 hover:text-foreground dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 hover:border-brand-border-hover"
             }`}

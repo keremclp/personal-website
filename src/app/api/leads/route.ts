@@ -6,11 +6,12 @@ import { verifySession } from "@/lib/auth";
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    const { name, email, category, budget, message } = data;
+    const { name, email, category, message } = data;
+    const budget = data.budget || "Not Specified";
 
-    if (!name || !email || !category || !budget || !message) {
+    if (!name || !email || !category || !message) {
       return NextResponse.json(
-        { error: "Required fields are missing: Name, Email, Category, Budget, Message." },
+        { error: "Required fields are missing: Name, Email, Category, Message." },
         { status: 400 }
       );
     }

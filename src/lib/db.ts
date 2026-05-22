@@ -14,34 +14,58 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
+function fixImagePath(path: string | undefined | null): string {
+  if (!path) return "/next.svg";
+  const trimmed = path.trim();
+  if (trimmed === "/projects/ai-saas.png") return "/projects/web-app.png";
+  if (trimmed === "/projects/luxury-ecommerce.png") return "/projects/mobile-app.png";
+  if (trimmed === "/projects/creative-agency.png") return "/projects/ai-app.png";
+  return trimmed;
+}
+
 export const db = {
   isSupabase: hasDbConfig,
   projects: {
     findMany: async (): Promise<Project[]> => {
+      let projects: Project[];
       if (hasDbConfig) {
         try {
-          return (await prisma.project.findMany({
+          projects = (await prisma.project.findMany({
             orderBy: { createdAt: "desc" },
           })) as unknown as Project[];
         } catch (err) {
           console.error("Prisma error in findMany, falling back to localDb", err);
-          return localDb.projects.findMany();
+          projects = await localDb.projects.findMany();
         }
+      } else {
+        projects = await localDb.projects.findMany();
       }
-      return localDb.projects.findMany();
+      return projects.map((p) => ({
+        ...p,
+        imageUrl: fixImagePath(p.imageUrl),
+      }));
     },
     findUnique: async (id: string): Promise<Project | null> => {
+      let project: Project | null;
       if (hasDbConfig) {
         try {
-          return (await prisma.project.findUnique({
+          project = (await prisma.project.findUnique({
             where: { id },
           })) as unknown as Project | null;
         } catch (err) {
           console.error("Prisma error in findUnique, falling back to localDb", err);
-          return localDb.projects.findUnique(id);
+          project = await localDb.projects.findUnique(id);
         }
+      } else {
+        project = await localDb.projects.findUnique(id);
       }
-      return localDb.projects.findUnique(id);
+      if (project) {
+        return {
+          ...project,
+          imageUrl: fixImagePath(project.imageUrl),
+        };
+      }
+      return null;
     },
     create: async (data: {
       title: string;
@@ -52,9 +76,10 @@ export const db = {
       githubLink?: string | null;
       category: string;
     }): Promise<Project> => {
+      let created: Project;
       if (hasDbConfig) {
         try {
-          return (await prisma.project.create({
+          created = (await prisma.project.create({
             data: {
               title: data.title,
               description: data.description,
@@ -67,18 +92,23 @@ export const db = {
           })) as unknown as Project;
         } catch (err) {
           console.error("Prisma error in create, falling back to localDb", err);
-          return localDb.projects.create({
+          created = await localDb.projects.create({
             ...data,
             liveLink: data.liveLink ?? null,
             githubLink: data.githubLink ?? null,
           });
         }
+      } else {
+        created = await localDb.projects.create({
+          ...data,
+          liveLink: data.liveLink ?? null,
+          githubLink: data.githubLink ?? null,
+        });
       }
-      return localDb.projects.create({
-        ...data,
-        liveLink: data.liveLink ?? null,
-        githubLink: data.githubLink ?? null,
-      });
+      return {
+        ...created,
+        imageUrl: fixImagePath(created.imageUrl),
+      };
     },
     update: async (
       id: string,
@@ -92,9 +122,10 @@ export const db = {
         category?: string;
       }
     ): Promise<Project> => {
+      let updated: Project;
       if (hasDbConfig) {
         try {
-          return (await prisma.project.update({
+          updated = (await prisma.project.update({
             where: { id },
             data: {
               ...data,
@@ -104,10 +135,15 @@ export const db = {
           })) as unknown as Project;
         } catch (err) {
           console.error("Prisma error in update, falling back to localDb", err);
-          return localDb.projects.update(id, data);
+          updated = await localDb.projects.update(id, data);
         }
+      } else {
+        updated = await localDb.projects.update(id, data);
       }
-      return localDb.projects.update(id, data);
+      return {
+        ...updated,
+        imageUrl: fixImagePath(updated.imageUrl),
+      };
     },
     delete: async (id: string): Promise<{ success: boolean }> => {
       if (hasDbConfig) {
