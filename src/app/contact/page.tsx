@@ -76,7 +76,7 @@ Brief: ${encodeURIComponent(formData.message)}
 Let's discuss my project!`;
 
     // WhatsApp API endpoint
-    return `https://wa.me/905000000000?text=${text}`;
+    return `https://wa.me/905317305614?text=${text}`;
   };
 
   return (
@@ -125,7 +125,7 @@ Let's discuss my project!`;
             </h4>
             
             <a
-              href="mailto:hello@keremcan.dev"
+              href="mailto:keremcancelepkolu@gmail.com"
               className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-brand-purple/5 border border-white/5 hover:border-brand-purple/20 transition-all group"
             >
               <div className="w-10 h-10 rounded-lg bg-brand-purple/10 flex items-center justify-center text-brand-purple group-hover:scale-105 transition-transform">
@@ -134,13 +134,13 @@ Let's discuss my project!`;
               <div>
                 <span className="text-xs font-mono text-zinc-500">Email Directly</span>
                 <p className="text-sm font-bold text-foreground dark:text-white group-hover:text-brand-purple transition-colors">
-                  hello@keremcan.dev
+                  keremcancelepkolu@gmail.com
                 </p>
               </div>
             </a>
 
             <a
-              href="https://wa.me/905000000000"
+              href="https://wa.me/905317305614"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-emerald-500/5 border border-white/5 hover:border-emerald-500/20 transition-all group"

@@ -251,7 +251,7 @@ export default function About() {
               Consultation Form
             </Link>
             <a
-              href="https://wa.me/905000000000"
+              href="https://wa.me/905317305614"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase bg-white/5 border border-brand-border text-foreground hover:border-emerald-500 hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"

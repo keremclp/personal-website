@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Sparkles, Layers, ShieldCheck, Zap, MessageSquare, Smartphone } from "lucide-react";
+import { ArrowRight, CheckCircle, Sparkles, Layers, ShieldCheck, Zap, Smartphone } from "lucide-react";
 import { db } from "@/lib/db";
 
 // Force dynamic rendering to ensure DB changes are visible instantly in dashboard
@@ -207,42 +207,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. Client Testimonials */}
-      <section className="w-full bg-brand-deep border-y border-brand-border py-20 md:py-28 relative">
-        <div className="max-w-5xl mx-auto px-6 md:px-12 text-center">
-          <div className="w-12 h-12 rounded-full bg-brand-purple/10 border border-brand-purple/20 flex items-center justify-center text-brand-purple mx-auto mb-6">
-            <MessageSquare size={20} className="fill-brand-purple/10" />
-          </div>
-          <span className="text-xs font-mono font-bold tracking-widest text-brand-cyan uppercase">
-            Client Success
-          </span>
-          <h2 className="text-3xl md:text-5xl font-bold mt-2 text-white mb-12">
-            What Clients Say About Working With Us
-          </h2>
-
-          <div className="glass-panel p-8 md:p-12 rounded-3xl text-left relative overflow-hidden">
-            {/* Quotation Glow */}
-            <div className="absolute right-8 bottom-4 opacity-5 text-9xl font-serif text-white pointer-events-none">
-              ”
-            </div>
-            
-            <p className="text-base md:text-xl font-sans italic text-zinc-300 leading-relaxed">
-              "Working with Kerem Can has completely transformed our conversion funnel. He rebuilt our entire marketing site and customer SaaS dashboard in Next.js in under 4 weeks. Our loading speeds dropped by 60%, and our signup rate rose by 34% within the first month. An absolute web engineering master!"
-            </p>
-            <div className="flex items-center gap-4 mt-8 pt-6 border-t border-brand-border">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-purple to-brand-pink flex items-center justify-center font-bold text-white">
-                MD
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Marcus Sterling</h4>
-                <p className="text-xs text-brand-cyan font-mono mt-0.5">Founder & CTO, NeuroFlow AI</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Sticky Call-To-Action (CTA) */}
+      {/* 4. Sticky Call-To-Action (CTA) */}
       <section className="max-w-5xl mx-auto px-6 md:px-12 w-full text-center">
         <div className="glass-panel p-10 md:p-16 rounded-3xl flex flex-col items-center gap-8 relative overflow-hidden border-glow">
           <div className="absolute inset-0 bg-gradient-to-br from-brand-purple/5 to-brand-cyan/5 pointer-events-none" />
@@ -263,7 +228,7 @@ export default async function Home() {
               <ArrowRight size={16} />
             </Link>
             <a
-              href="https://wa.me/905000000000?text=Hello%20Kerem Can!%20I'm%20interested%20in%20web%20development%20services."
+              href="https://wa.me/905317305614?text=Hello%20Kerem Can!%20I'm%20interested%20in%20web%20development%20services."
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-sm tracking-wider uppercase bg-white/5 border border-brand-border text-foreground hover:border-emerald-500 hover:bg-emerald-500/5 transition-all flex items-center justify-center gap-2"

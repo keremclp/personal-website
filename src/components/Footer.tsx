@@ -95,10 +95,10 @@ export default function Footer() {
             Have a project idea? Email directly or hit me up on socials!
           </p>
           <a
-            href="mailto:hello@keremcan.dev"
+            href="mailto:keremcancelepkolu@gmail.com"
             className="text-sm font-semibold text-brand-cyan hover:underline decoration-brand-cyan/30 mt-1"
           >
-            hello@keremcan.dev
+            keremcancelepkolu@gmail.com
           </a>
           <div className="flex items-center gap-3 mt-2">
             <a
@@ -149,7 +149,7 @@ export default function Footer() {
               </svg>
             </a>
             <a
-              href="https://wa.me/905000000000"
+              href="https://wa.me/905317305614"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-white/5 border border-brand-border text-zinc-400 hover:text-emerald-500 dark:hover:text-white hover:border-emerald-500 hover:bg-emerald-500/5 transition-all"
