@@ -1,0 +1,32 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  imageUrl    String
+  techStack   String   // Stored as a comma-separated list or JSON string (e.g. "Next.js, Tailwind, TypeScript")
+  liveLink    String?
+  githubLink  String?
+  category    String   // e.g. "SaaS", "E-commerce", "Marketing", "AI"
+  createdAt   DateTime @default(now())
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  category  String
+  budget    String   // e.g., "$1k-$3k", "$3k-$5k", "$5k+"
+  message   String
+  status    String   @default("NEW") // "NEW", "REVIEWED", "ARCHIVED"
+  createdAt DateTime @default(now())
+}

@@ -1,26 +1,243 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(html:not(.light), html:not(.light) *));
 
-@theme inline {
-  --color-background: var(--background);
+@theme {
+  --font-sans: 'Outfit', var(--font-geist-sans), sans-serif;
+  --font-mono: 'Space Mono', var(--font-geist-mono), monospace;
+  
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-card: var(--brand-card);
+  --color-brand-purple: #8b5cf6;
+  --color-brand-pink: #ec4899;
+  --color-brand-cyan: #06b6d4;
+  --color-brand-border: var(--brand-border);
+  --color-brand-border-hover: var(--brand-border-hover);
+  --color-brand-glass: var(--brand-glass);
+
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+
+  /* Override standard zinc colors so existing templates dynamically toggle text contrast */
+  --color-zinc-300: var(--custom-zinc-300);
+  --color-zinc-400: var(--custom-zinc-400);
+  --color-zinc-500: var(--custom-zinc-500);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Default is DARK theme per user preference */
+  color-scheme: dark;
+  --background: #050507;
+  --foreground: #f4f4f6;
+  
+  --brand-dark: #050507;
+  --brand-deep: #0a0a0f;
+  --brand-card: #11111a;
+  --brand-border: rgba(255, 255, 255, 0.06);
+  --brand-border-hover: rgba(255, 255, 255, 0.12);
+  --brand-glass: rgba(10, 10, 15, 0.7);
+
+  /* Dark mode text levels */
+  --custom-zinc-300: #d4d4d8;
+  --custom-zinc-400: #a1a1aa;
+  --custom-zinc-500: #71717a;
+}
+
+.light {
+  /* LIGHT theme override */
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --brand-dark: #f8fafc;
+  --brand-deep: #f1f5f9;
+  --brand-card: #ffffff;
+  --brand-border: rgba(15, 23, 42, 0.08);
+  --brand-border-hover: rgba(15, 23, 42, 0.16);
+  --brand-glass: rgba(255, 255, 255, 0.7);
+
+  /* Light mode text levels - dark slate for rich contrast */
+  --custom-zinc-300: #475569; /* slate-600 */
+  --custom-zinc-400: #334155; /* slate-700 */
+  --custom-zinc-500: #1e293b; /* slate-800 */
+}
+
+/* Light mode overrides for structural elements with hardcoded dark styles */
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light h6 {
+  color: var(--foreground) !important;
+}
+
+.light input,
+.light textarea,
+.light select {
+  color: var(--foreground) !important;
+  background-color: var(--brand-deep) !important;
+  border-color: var(--brand-border) !important;
+}
+
+.light option {
+  background-color: var(--brand-card) !important;
+  color: var(--foreground) !important;
+}
+
+
+
+/* Soften light-mode transparency backgrounds */
+.light .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+.light .bg-white\/10 {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+.light .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+.light .border-white\/5 {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+.light .border-white\/10 {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--brand-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-border-hover);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Premium Glow Background Blobs */
+.glow-blob {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: -10;
+  animation: float 20s infinite alternate;
+  transition: opacity 0.3s ease;
+}
+
+.light .glow-blob {
+  opacity: 0.02;
+}
+
+.glow-blob-purple {
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+}
+
+.glow-blob-cyan {
+  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+  bottom: 10%;
+  left: -200px;
+  animation-delay: -5s;
+}
+
+.glow-blob-pink {
+  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+  top: 40%;
+  right: -150px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(40px, -60px) scale(1.1);
+  }
+  100% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* Custom Utilities */
+.glass-panel {
+  background: var(--brand-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--brand-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.08);
+  transform: translateY(-2px);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #0f172a 10%, #6d28d9 60%, #0891b2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .text-gradient, :root:not(.light) .text-gradient {
+  background: linear-gradient(135deg, #ffffff 10%, #a78bfa 60%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-neon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Border Glow utility for ultra premium hover states */
+.border-glow {
+  position: relative;
+}
+.border-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+.border-glow:hover::before {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
 }
