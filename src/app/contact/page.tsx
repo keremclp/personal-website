@@ -150,7 +150,7 @@ Let's discuss my project!`;
               <div>
                 <span className="text-xs font-mono text-zinc-500">WhatsApp Chat</span>
                 <p className="text-sm font-bold text-foreground dark:text-white group-hover:text-emerald-400 transition-colors">
-                  +90 500 000 00 00
+                  +90 531 730 56 14
                 </p>
               </div>
             </a>
