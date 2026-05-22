@@ -17,9 +17,9 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 function fixImagePath(path: string | undefined | null): string {
   if (!path) return "/next.svg";
   const trimmed = path.trim();
-  if (trimmed === "/projects/ai-saas.png") return "/projects/web-app.png";
-  if (trimmed === "/projects/luxury-ecommerce.png") return "/projects/mobile-app.png";
-  if (trimmed === "/projects/creative-agency.png") return "/projects/ai-app.png";
+  if (trimmed === "/projects/ai-saas.png") return "/projects/web-app.jpg";
+  if (trimmed === "/projects/luxury-ecommerce.png") return "/projects/mobile-app.jpg";
+  if (trimmed === "/projects/creative-agency.png") return "/projects/ai-app.jpg";
   return trimmed;
 }
 

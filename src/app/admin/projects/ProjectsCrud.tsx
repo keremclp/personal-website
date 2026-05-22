@@ -22,9 +22,9 @@ interface ProjectsCrudProps {
 }
 
 const DEFAULT_IMAGES = [
-  { label: "AI Creative Mockup", path: "/projects/ai-app.png" },
-  { label: "Luxury Horology Mockup", path: "/projects/mobile-app.png" },
-  { label: "Predictive Analytics Mockup", path: "/projects/web-app.png" },
+  { label: "AI Creative Mockup", path: "/projects/ai-app.jpg" },
+  { label: "Luxury Horology Mockup", path: "/projects/mobile-app.jpg" },
+  { label: "Predictive Analytics Mockup", path: "/projects/web-app.jpg" },
 ];
 
 export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
@@ -47,7 +47,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    imageUrl: "/projects/ai-app.png",
+    imageUrl: "/projects/ai-app.jpg",
     techStack: "",
     liveLink: "",
     githubLink: "",
@@ -62,7 +62,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
     setFormData({
       title: "",
       description: "",
-      imageUrl: "/projects/ai-app.png",
+      imageUrl: "/projects/ai-app.jpg",
       techStack: "",
       liveLink: "",
       githubLink: "",
@@ -330,7 +330,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   required
                   value={formData.imageUrl}
                   onChange={handleChange}
-                  placeholder="e.g. https://images.unsplash.com/... or /projects/ai-app.png"
+                  placeholder="e.g. https://images.unsplash.com/... or /projects/ai-app.jpg"
                   className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
                 />
                 
