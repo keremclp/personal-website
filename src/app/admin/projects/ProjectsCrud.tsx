@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Plus, Edit2, Trash2, X, Save, Upload, Image as ImageIcon, Link2 } from "lucide-react";
 
 interface Project {
   id: string;
@@ -19,17 +19,58 @@ interface ProjectsCrudProps {
   initialProjects: Project[];
 }
 
-const DEFAULT_IMAGES = [
-  { label: "Kurumsal Web", path: "/projects/showcase-web.jpg" },
-  { label: "E-Ticaret Vitrini", path: "/projects/showcase-ecommerce.jpg" },
-  { label: "Yönetim Portalı", path: "/projects/showcase-portal.jpg" },
-  { label: "Mobil Uygulama", path: "/projects/showcase-mobile.jpg" },
-];
+const MAX_UPLOAD_DIMENSION = 1400;
+const MAX_DATA_URL_LENGTH = 900_000; // ~675 KB binary safety cap for fast page loads
+
+function compressImageToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Görsel dosyası okunamadı."));
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onerror = () => reject(new Error("Geçersiz görsel formatı."));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > MAX_UPLOAD_DIMENSION || height > MAX_UPLOAD_DIMENSION) {
+          const ratio = Math.min(MAX_UPLOAD_DIMENSION / width, MAX_UPLOAD_DIMENSION / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Görsel işleme başlatılamadı."));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Try crisp WebP first, fall back to JPEG if needed
+        let dataUrl = canvas.toDataURL("image/webp", 0.84);
+        if (!dataUrl.startsWith("data:image/webp")) {
+          dataUrl = canvas.toDataURL("image/jpeg", 0.84);
+        }
+        if (dataUrl.length > MAX_DATA_URL_LENGTH) {
+          dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+        }
+        resolve(dataUrl);
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -45,7 +86,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    imageUrl: "/projects/showcase-web.jpg",
+    imageUrl: "",
     techStack: "",
     liveLink: "",
     githubLink: "",
@@ -55,17 +96,75 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const processImageFile = useCallback(async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setError("Lütfen yalnızca PNG, JPG veya WebP formatında bir görsel yükleyin.");
+      return;
+    }
+    setError("");
+    setUploadingImage(true);
+    try {
+      const compressedDataUrl = await compressImageToDataUrl(file);
+      setFormData((prev) => ({ ...prev, imageUrl: compressedDataUrl }));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Görsel yüklenirken bir hata oluştu.");
+    } finally {
+      setUploadingImage(false);
+    }
+  }, []);
+
+  // Support Ctrl+V direct screenshot paste while modal is open
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            await processImageFile(file);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, [isModalOpen, processImageFile]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processImageFile(file);
+    }
+    e.target.value = "";
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await processImageFile(file);
+    }
+  };
+
   const handleOpenAdd = () => {
     setEditingProject(null);
     setFormData({
       title: "",
       description: "",
-      imageUrl: "/projects/showcase-web.jpg",
-      techStack: "",
+      imageUrl: "",
+      techStack: "Özel Tasarım",
       liveLink: "",
       githubLink: "",
       category: "",
     });
+    setShowUrlInput(false);
     setError("");
     setIsModalOpen(true);
   };
@@ -76,11 +175,12 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
       title: project.title,
       description: project.description,
       imageUrl: project.imageUrl,
-      techStack: project.techStack,
+      techStack: project.techStack || "Özel Tasarım",
       liveLink: project.liveLink || "",
       githubLink: project.githubLink || "",
       category: project.category,
     });
+    setShowUrlInput(false);
     setError("");
     setIsModalOpen(true);
   };
@@ -96,9 +196,14 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    if (!formData.imageUrl.trim()) {
+      setError("Lütfen bir proje görseli yükleyin veya görsel bağlantısı girin.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const url = editingProject ? `/api/projects/${editingProject.id}` : "/api/projects";
       const method = editingProject ? "PUT" : "POST";
@@ -108,6 +213,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          techStack: formData.techStack.trim() || "Özel Tasarım",
           liveLink: formData.liveLink || null,
           githubLink: formData.githubLink || null,
         }),
@@ -162,7 +268,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
         <button
           type="button"
           onClick={handleOpenAdd}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold bg-ink text-background hover:bg-accent hover:text-white transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold bg-ink text-background hover:bg-accent-lime hover:text-[#0B1F1A] transition-colors cursor-pointer"
         >
           <Plus size={14} />
           Yeni Proje Ekle
@@ -203,20 +309,6 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                 <p className="text-xs text-ink-secondary leading-relaxed line-clamp-2">
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-1 mt-auto pt-3 border-t border-line">
-                  {project.techStack
-                    .split(",")
-                    .map((t) => t.trim())
-                    .filter(Boolean)
-                    .map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-0.5 rounded bg-surface border border-line text-[10px] font-mono text-ink-muted"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                </div>
               </div>
 
               <div className="flex items-center gap-2 px-5 py-3 border-t border-line bg-surface/60">
@@ -242,7 +334,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Modal with Direct Image Upload, Drag-Drop & Ctrl+V Paste */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/55 dark:bg-black/75 backdrop-blur-sm">
           <div className="w-full max-w-2xl bg-surface-elevated border border-line rounded-3xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
@@ -268,6 +360,112 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   {error}
                 </div>
               )}
+
+              {/* Direct Image Upload Dropzone + Live Preview */}
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider">
+                    Proje Görseli (Yükle · Sürükle · Ctrl+V Yapıştır)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput((prev) => !prev)}
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline cursor-pointer"
+                  >
+                    <Link2 size={12} />
+                    {showUrlInput ? "URL Alanını Gizle" : "URL ile Ekle"}
+                  </button>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${
+                    isDragging
+                      ? "border-accent bg-accent-soft"
+                      : "border-line-strong bg-surface hover:border-accent/60"
+                  }`}
+                >
+                  {formData.imageUrl ? (
+                    <div className="relative w-full aspect-[16/9] bg-surface-subtle group">
+                      <img
+                        src={formData.imageUrl}
+                        alt="Seçilen proje görseli"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-ink/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white">
+                        <Upload size={22} />
+                        <span className="text-xs font-semibold">
+                          Yeni Görsel Yüklemek İçin Tıklayın veya Sürükleyin
+                        </span>
+                        <span className="text-[11px] text-white/75">
+                          (Ekran görüntüsünü doğrudan Ctrl + V ile yapıştırabilirsiniz)
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-10 px-6 flex flex-col items-center justify-center text-center gap-2.5">
+                      <div className="w-12 h-12 rounded-2xl bg-surface-elevated border border-line flex items-center justify-center text-accent">
+                        {uploadingImage ? <ImageIcon size={20} className="animate-pulse" /> : <Upload size={20} />}
+                      </div>
+                      <p className="text-sm font-semibold text-ink">
+                        {uploadingImage
+                          ? "Görsel optimize ediliyor..."
+                          : "Bilgisayardan Fotoğraf Seçin veya Buraya Sürükleyin"}
+                      </p>
+                      <p className="text-xs text-ink-muted">
+                        PNG, JPG, WebP desteklenir · Ekran görüntüsü alıp doğrudan{" "}
+                        <strong className="text-ink">Ctrl + V</strong> ile yapıştırabilirsiniz
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {formData.imageUrl && (
+                  <div className="flex items-center justify-between text-[11px] text-ink-muted">
+                    <span>
+                      {formData.imageUrl.startsWith("data:image/")
+                        ? "✓ Görsel optimize edildi ve doğrudan veritabanına kaydedilmeye hazır."
+                        : `Görsel kaynağı: ${formData.imageUrl}`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="text-accent font-semibold hover:underline cursor-pointer"
+                    >
+                      Değiştir
+                    </button>
+                  </div>
+                )}
+
+                {showUrlInput && (
+                  <input
+                    type="text"
+                    id="imageUrl"
+                    name="imageUrl"
+                    value={formData.imageUrl.startsWith("data:image/") ? "" : formData.imageUrl}
+                    onChange={handleChange}
+                    placeholder="https://ornek.com/ekran-goruntusu.png"
+                    className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
+                  />
+                )}
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -303,7 +501,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                     required
                     value={formData.category}
                     onChange={handleChange}
-                    placeholder="Örn: Kurumsal Web, SaaS, E-Ticaret, Mobil"
+                    placeholder="Örn: Kurumsal Web, E-Ticaret, Mobil, Özel Yazılım"
                     className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
@@ -323,85 +521,8 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Projenin kapsamını ve sağladığı değeri özetleyin..."
+                  placeholder="Projenin kapsamını ve müşteriye sağladığı değeri özetleyin..."
                   className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent resize-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2.5">
-                <label
-                  htmlFor="imageUrl"
-                  className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
-                >
-                  Görsel Yolu veya URL (Veritabanına Doğrudan Kaydedilir)
-                </label>
-                <input
-                  type="text"
-                  id="imageUrl"
-                  name="imageUrl"
-                  required
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="Örn: https://... veya /projects/showcase-web.jpg"
-                  className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
-                />
-
-                {/* Visual Thumbnail Picker */}
-                <div className="flex flex-col gap-2 mt-1">
-                  <span className="text-[11px] font-mono text-ink-muted">
-                    Hazır Stüdyo Görseli Seç (Tek Tıkla DB&apos;ye Kaydet):
-                  </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {DEFAULT_IMAGES.map((img) => {
-                      const active = formData.imageUrl === img.path;
-                      return (
-                        <button
-                          key={img.path}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, imageUrl: img.path })}
-                          className={`rounded-xl overflow-hidden border text-left transition-all cursor-pointer bg-surface ${
-                            active
-                              ? "border-accent ring-2 ring-accent/30"
-                              : "border-line hover:border-line-strong"
-                          }`}
-                        >
-                          <div className="w-full aspect-[16/10] bg-surface-subtle overflow-hidden">
-                            <img
-                              src={img.path}
-                              alt={img.label}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div
-                            className={`px-2 py-1.5 text-[10px] font-semibold truncate ${
-                              active ? "text-accent" : "text-ink-secondary"
-                            }`}
-                          >
-                            {img.label}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="techStack"
-                  className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
-                >
-                  Teknolojiler (Virgülle ayırın)
-                </label>
-                <input
-                  type="text"
-                  id="techStack"
-                  name="techStack"
-                  required
-                  value={formData.techStack}
-                  onChange={handleChange}
-                  placeholder="Next.js, TypeScript, Tailwind CSS, PostgreSQL"
-                  className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                 />
               </div>
 
@@ -426,18 +547,18 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
 
                 <div className="flex flex-col gap-1.5">
                   <label
-                    htmlFor="githubLink"
+                    htmlFor="techStack"
                     className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
                   >
-                    GitHub Linki (Opsiyonel)
+                    Etiketler / Kapsam (Opsiyonel)
                   </label>
                   <input
-                    type="url"
-                    id="githubLink"
-                    name="githubLink"
-                    value={formData.githubLink}
+                    type="text"
+                    id="techStack"
+                    name="techStack"
+                    value={formData.techStack}
                     onChange={handleChange}
-                    placeholder="https://github.com/keremclp/..."
+                    placeholder="Kurumsal Web, Çoklu Dil, Yönetim Paneli"
                     className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
@@ -446,11 +567,11 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
               <div className="flex items-center gap-3 mt-3 pt-4 border-t border-line">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-grow py-3 rounded-full bg-ink text-background hover:bg-accent hover:text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer transition-colors"
+                  disabled={loading || uploadingImage}
+                  className="flex-grow py-3 rounded-full bg-ink text-background hover:bg-accent-lime hover:text-[#0B1F1A] text-xs font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer transition-colors"
                 >
                   <Save size={13} />
-                  {loading ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
+                  {loading ? "Kaydediliyor..." : "Veritabanına Kaydet"}
                 </button>
                 <button
                   type="button"

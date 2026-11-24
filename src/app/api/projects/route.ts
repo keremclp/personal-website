@@ -24,11 +24,12 @@ export async function POST(request: NextRequest) {
 
     // 2. Extract and validate input data
     const data = await request.json();
-    const { title, description, imageUrl, techStack, liveLink, githubLink, category } = data;
+    const { title, description, imageUrl, liveLink, githubLink, category } = data;
+    const techStack = (data.techStack || "Özel Tasarım").trim();
 
-    if (!title || !description || !imageUrl || !techStack || !category) {
+    if (!title || !description || !imageUrl || !category) {
       return NextResponse.json(
-        { error: "Required fields are missing: Title, Description, Image URL, Tech Stack, Category." },
+        { error: "Zorunlu alanlar eksik: Başlık, Açıklama, Görsel ve Kategori gereklidir." },
         { status: 400 }
       );
     }
