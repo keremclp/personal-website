@@ -32,51 +32,67 @@ interface LocalSchema {
 
 const DB_FILE_PATH = path.join(process.cwd(), ".data", "db.json");
 
-// High-fidelity pre-seeded projects to wow the user immediately!
+// Clean fallback projects used only when DATABASE_URL is not configured locally
 const SEED_PROJECTS: Project[] = [
   {
     id: "proj-1",
-    title: "NeuroFlow AI - Predictive Analytics Platform",
-    description: "Designed and built a custom B2B SaaS dashboard and data pipeline for an AI forecasting tool. Optimized query latency by 40% and delivered a modern glassmorphic dashboard interface that contributed to their $1.2M seed round.",
-    imageUrl: "/projects/web-app.jpg",
-    techStack: "Next.js 15, Tailwind v4, TypeScript, Supabase, Chart.js",
-    liveLink: "https://neuroflow.ai-demo.dev",
+    title: "Operasyon & Analitik Yönetim Platformu",
+    description:
+      "Kurumsal ekiplerin gelir, proje akışı ve müşteri süreçlerini tek merkezden yönetmesi için tasarlanan modern yönetim paneli. Hızlı filtreleme, rol bazlı erişim ve sade veri sunumuyla karar alma sürecini hızlandırmak üzere geliştirildi.",
+    imageUrl: "/projects/saas-platform.jpg",
+    techStack: "Web Platform, Yönetim Paneli",
+    liveLink: null,
     githubLink: null,
-    category: "SaaS",
-    createdAt: new Date("2026-02-15T09:00:00Z"),
+    category: "Özel Yazılım",
+    createdAt: new Date("2026-04-15T09:00:00Z"),
   },
   {
     id: "proj-2",
-    title: "Aurelius - Luxury Horology Storefront",
-    description: "Developed a premium, highly responsive e-commerce experience for an independent luxury watchmaker. Featuring dynamic animations, seamless cart integration, custom stripe checkouts, and clean minimalist editorial grids.",
-    imageUrl: "/projects/mobile-app.jpg",
-    techStack: "Next.js 15, React 19, Tailwind v4, Stripe, Framer Motion",
-    liveLink: "https://aurelius-watches.demo",
+    title: "Atelier — Tasarım & E-Ticaret Vitrini",
+    description:
+      "Seçkin bir tasarım markası için yüksek görsel kaliteye sahip, hızlı açılan ve mobil öncelikli vitrin ile sipariş deneyimi. Güçlü ürün sunumu ve sade alışveriş akışıyla ziyaretçi güvenini ve satış dönüşümünü artırmak üzere kurgulandı.",
+    imageUrl: "/projects/commerce-editorial.jpg",
+    techStack: "E-Ticaret, Marka Vitrini",
+    liveLink: null,
     githubLink: null,
-    category: "E-commerce",
+    category: "E-Ticaret",
     createdAt: new Date("2026-03-22T14:30:00Z"),
   },
   {
     id: "proj-3",
-    title: "Verdant - Web3 Creative Brand Agency",
-    description: "Crafted a visually stunning, high-converting design agency portfolio with interactive 3D web features, dark tech design trends, and flawless mobile performance. Ranked in CSS Design Awards and boosted inquiry rates by 180%.",
-    imageUrl: "/projects/ai-app.jpg",
-    techStack: "Next.js 15, Three.js, Tailwind v4, Web Crypto API",
-    liveLink: "https://verdant-studios.demo",
+    title: "Rezervasyon & Yaşam Tarzı Mobil Uygulaması",
+    description:
+      "Kullanıcıların mekan keşfi, anlık rezervasyon ve kişisel takvim yönetimini tek uygulamada yapabildiği iOS & Android mobil deneyimi. Akıcı gezinme ve sade tasarım diliyle yüksek kullanıcı memnuniyeti hedeflenerek teslim edildi.",
+    imageUrl: "/projects/mobile-experience.jpg",
+    techStack: "Mobil Uygulama, iOS & Android",
+    liveLink: null,
     githubLink: null,
-    category: "Creative",
-    createdAt: new Date("2026-04-10T11:15:00Z"),
+    category: "Mobil",
+    createdAt: new Date("2026-02-10T11:15:00Z"),
+  },
+  {
+    id: "proj-4",
+    title: "Kurumsal Mimarlık & Marka Web Platformu",
+    description:
+      "Proje portfolyosunu uluslararası standartlarda sergilemek isteyen bir mimarlık ofisi için editoryal tasarım dili, çoklu dil yapısı ve yüksek Google görünürlüğüyle hazırlanan kurumsal web sitesi.",
+    imageUrl: "/projects/corporate-web.jpg",
+    techStack: "Kurumsal Web, Çoklu Dil",
+    liveLink: null,
+    githubLink: null,
+    category: "Kurumsal Web",
+    createdAt: new Date("2026-01-18T10:00:00Z"),
   },
 ];
 
 const SEED_LEADS: Lead[] = [
   {
     id: "lead-1",
-    name: "Alex Rivera",
-    email: "alex@riveratech.io",
-    category: "SaaS Development",
-    budget: "$5k - $10k",
-    message: "Hey Kerem Can! We saw your NeuroFlow project and loved the dark mode design. We want to build a similar analytics interface for our cloud cost intelligence tool. Let's jump on a call this week!",
+    name: "Mert Kaya",
+    email: "mert@ornekfirma.com",
+    category: "Kurumsal Web Sitesi",
+    budget: "50.000 ₺ – 120.000 ₺",
+    message:
+      "Merhaba, şirketimizin mevcut web sitesini daha modern ve kurumsal bir tasarımla yenilemek, ayrıca Türkçe/İngilizce dil desteği eklemek istiyoruz. Uygun bir zamanda görüşebilir miyiz?",
     status: "NEW",
     createdAt: new Date("2026-05-20T10:00:00Z"),
   },
@@ -100,9 +116,8 @@ function initDb(): LocalSchema {
   try {
     const content = fs.readFileSync(DB_FILE_PATH, "utf-8");
     const data = JSON.parse(content);
-    // Parse ISO dates back to Date objects
-    data.projects = data.projects.map((p: any) => ({ ...p, createdAt: new Date(p.createdAt) }));
-    data.leads = data.leads.map((l: any) => ({ ...l, createdAt: new Date(l.createdAt) }));
+    data.projects = data.projects.map((p: Project) => ({ ...p, createdAt: new Date(p.createdAt) }));
+    data.leads = data.leads.map((l: Lead) => ({ ...l, createdAt: new Date(l.createdAt) }));
     return data;
   } catch (error) {
     console.error("Failed to read JSON DB, resetting to defaults", error);
@@ -124,7 +139,6 @@ function writeDb(data: LocalSchema) {
 }
 
 export const localDb = {
-  // Project operations
   projects: {
     findMany: async () => {
       const db = initDb();
@@ -138,7 +152,7 @@ export const localDb = {
       const db = initDb();
       const newProject: Project = {
         ...data,
-        id: "proj-" + Math.random().toString(36).substr(2, 9),
+        id: "proj-" + Math.random().toString(36).substring(2, 11),
         createdAt: new Date(),
       };
       db.projects.push(newProject);
@@ -166,7 +180,6 @@ export const localDb = {
     },
   },
 
-  // Lead operations
   leads: {
     findMany: async () => {
       const db = initDb();
@@ -176,7 +189,7 @@ export const localDb = {
       const db = initDb();
       const newLead: Lead = {
         ...data,
-        id: "lead-" + Math.random().toString(36).substr(2, 9),
+        id: "lead-" + Math.random().toString(36).substring(2, 11),
         status: "NEW",
         createdAt: new Date(),
       };

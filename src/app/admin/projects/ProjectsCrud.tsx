@@ -1,9 +1,7 @@
-"use strict";
-
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X, Check, Save, Link2, FolderOpen, Image } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Save } from "lucide-react";
 
 interface Project {
   id: string;
@@ -22,9 +20,10 @@ interface ProjectsCrudProps {
 }
 
 const DEFAULT_IMAGES = [
-  { label: "AI Creative Mockup", path: "/projects/ai-app.jpg" },
-  { label: "Luxury Horology Mockup", path: "/projects/mobile-app.jpg" },
-  { label: "Predictive Analytics Mockup", path: "/projects/web-app.jpg" },
+  { label: "SaaS Panel Mockup", path: "/projects/saas-platform.jpg" },
+  { label: "E-Ticaret Vitrini", path: "/projects/commerce-editorial.jpg" },
+  { label: "Mobil Uygulama", path: "/projects/mobile-experience.jpg" },
+  { label: "Kurumsal Web", path: "/projects/corporate-web.jpg" },
 ];
 
 export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
@@ -32,7 +31,6 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-  // Lock body scroll when modal is open for a premium micro-UX experience
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
@@ -43,11 +41,11 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
       document.body.style.overflow = "";
     };
   }, [isModalOpen]);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    imageUrl: "/projects/ai-app.jpg",
+    imageUrl: "/projects/saas-platform.jpg",
     techStack: "",
     liveLink: "",
     githubLink: "",
@@ -62,7 +60,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
     setFormData({
       title: "",
       description: "",
-      imageUrl: "/projects/ai-app.jpg",
+      imageUrl: "/projects/saas-platform.jpg",
       techStack: "",
       liveLink: "",
       githubLink: "",
@@ -87,11 +85,13 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
     setIsModalOpen(true);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,27 +116,25 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save project.");
+        throw new Error(data.error || "Proje kaydedilemedi.");
       }
 
       if (editingProject) {
-        // Update local state
         setProjects(projects.map((p) => (p.id === editingProject.id ? data : p)));
       } else {
-        // Add to local state list
         setProjects([data, ...projects]);
       }
 
       setIsModalOpen(false);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Beklenmedik bir hata oluştu.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to permanently delete this project?")) return;
+    if (!confirm("Bu projeyi kalıcı olarak silmek istediğinize emin misiniz?")) return;
 
     try {
       const response = await fetch(`/api/projects/${id}`, {
@@ -145,94 +143,98 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to delete project.");
+        throw new Error(data.error || "Proje silinemedi.");
       }
 
-      // Remove from state list
       setProjects(projects.filter((p) => p.id !== id));
-    } catch (err: any) {
-      alert(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Beklenmedik bir hata oluştu.");
     }
   };
 
   return (
     <div className="w-full flex flex-col gap-6">
-      
-      {/* Dynamic Actions Bar */}
-      <div className="flex items-center justify-between pb-4 border-b border-brand-border">
-        <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
-          Portfolio Items ({projects.length})
+      {/* Actions Bar */}
+      <div className="flex items-center justify-between pb-4 border-b border-line">
+        <span className="text-xs font-mono font-semibold text-ink-muted uppercase tracking-wider">
+          Portfolyo Kayıtları ({projects.length})
         </span>
         <button
+          type="button"
           onClick={handleOpenAdd}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-brand-purple to-brand-cyan text-white hover:opacity-90 transition-all shadow-md shadow-brand-purple/10 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold bg-ink text-background hover:bg-accent hover:text-white transition-colors cursor-pointer"
         >
           <Plus size={14} />
-          Add Project
+          Yeni Proje Ekle
         </button>
       </div>
 
-      {/* Grid of editable items */}
+      {/* Projects Grid */}
       {projects.length === 0 ? (
-        <div className="glass-panel p-16 text-center rounded-3xl">
-          <p className="text-zinc-500 font-mono text-sm">No projects listed. Click "Add Project" above to create one!</p>
+        <div className="studio-card p-16 text-center rounded-3xl">
+          <p className="text-ink-muted text-sm">
+            Henüz proje eklenmemiş. Yukarıdaki &quot;Yeni Proje Ekle&quot; butonunu kullanabilirsiniz.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <div
               key={project.id}
-              className="glass-panel rounded-2xl overflow-hidden flex flex-col group relative border border-white/5"
+              className="studio-card rounded-2xl overflow-hidden flex flex-col"
             >
-              {/* Media box */}
-              <div className="w-full aspect-video relative overflow-hidden bg-brand-dark/50 border-b border-brand-border">
+              <div className="w-full aspect-[16/10] relative overflow-hidden bg-surface border-b border-line">
                 <img
-                  src={project.imageUrl || "/next.svg"}
+                  src={project.imageUrl || "/projects/saas-platform.jpg"}
                   alt={project.title}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-3 left-3 px-2 py-0.5 rounded bg-brand-dark/85 backdrop-blur text-[9px] font-bold text-brand-cyan uppercase tracking-wider border border-white/5">
+                <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-surface-elevated/92 border border-line text-[10px] font-mono font-medium text-ink">
                   {project.category}
                 </span>
               </div>
 
-              {/* Data details */}
-              <div className="p-5 flex flex-col flex-grow gap-3">
-                <h3 className="text-sm font-bold text-white leading-tight line-clamp-1">
+              <div className="p-5 flex flex-col flex-grow gap-2.5">
+                <h3 className="text-base font-bold text-ink leading-snug line-clamp-1">
                   {project.title}
                 </h3>
-                <p className="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-2">
+                <p className="text-xs text-ink-secondary leading-relaxed line-clamp-2">
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-1 mt-auto pt-3 border-t border-white/5">
-                  {project.techStack.split(",").map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-1.5 py-0.5 rounded bg-white/5 border border-brand-border text-[9px] font-mono text-zinc-400"
-                    >
-                      {tech.trim()}
-                    </span>
-                  ))}
+                <div className="flex flex-wrap gap-1 mt-auto pt-3 border-t border-line">
+                  {project.techStack
+                    .split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean)
+                    .map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2 py-0.5 rounded bg-surface border border-line text-[10px] font-mono text-ink-muted"
+                      >
+                        {tech}
+                      </span>
+                    ))}
                 </div>
               </div>
 
-              {/* Actions row */}
-              <div className="flex items-center gap-1.5 px-5 py-3 border-t border-brand-border bg-brand-dark/20">
+              <div className="flex items-center gap-2 px-5 py-3 border-t border-line bg-surface/60">
                 <button
+                  type="button"
                   onClick={() => handleOpenEdit(project)}
-                  className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded bg-white/5 border border-brand-border text-[10px] font-mono text-zinc-500 dark:text-zinc-300 hover:text-brand-purple hover:bg-brand-purple/5 hover:border-brand-purple/20 transition-all cursor-pointer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-surface-elevated border border-line text-xs font-medium text-ink hover:border-line-strong transition-colors cursor-pointer"
                 >
-                  <Edit2 size={10} />
-                  Edit
+                  <Edit2 size={12} />
+                  Düzenle
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDelete(project.id)}
-                  className="p-1.5 rounded bg-red-500/5 border border-red-500/10 text-red-600 dark:text-red-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer animate-fade-in"
-                  aria-label="Delete Project"
+                  className="p-2 rounded-lg border border-red-500/20 bg-red-500/8 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Projeyi Sil"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
@@ -240,37 +242,40 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
         </div>
       )}
 
-      {/* CRUD Add/Edit Glassmorphic Drawer Dialog */}
+      {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-2xl bg-brand-deep border border-brand-border rounded-3xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl relative">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-dark/40">
-              <h3 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {editingProject ? "Update Portfolio Item" : "Create Portfolio Item"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/55 dark:bg-black/75 backdrop-blur-sm">
+          <div className="w-full max-w-2xl bg-surface-elevated border border-line rounded-3xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-line bg-surface/60">
+              <h3 className="text-sm font-bold text-ink">
+                {editingProject ? "Projeyi Güncelle" : "Yeni Proje Oluştur"}
               </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-foreground dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/5 transition-colors"
+                className="w-8 h-8 rounded-full border border-line bg-surface-elevated text-ink-secondary hover:text-ink flex items-center justify-center cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            {/* Scrollable Contents */}
-            <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 md:p-8 flex flex-col gap-5">
+            <form
+              onSubmit={handleSubmit}
+              className="flex-grow overflow-y-auto p-6 md:p-8 flex flex-col gap-5"
+            >
               {error && (
-                <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/10 text-xs text-red-400">
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400">
                   {error}
                 </div>
               )}
 
-              {/* Title & Category Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="title" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Project Title
+                  <label
+                    htmlFor="title"
+                    className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                  >
+                    Proje Başlığı
                   </label>
                   <input
                     type="text"
@@ -279,14 +284,17 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                     required
                     value={formData.title}
                     onChange={handleChange}
-                    placeholder="e.g. NeuroFlow - AI SaaS Tool"
-                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                    placeholder="Örn: Kurumsal Web Platformu"
+                    className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="category" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Display Category
+                  <label
+                    htmlFor="category"
+                    className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                  >
+                    Kategori
                   </label>
                   <input
                     type="text"
@@ -295,16 +303,18 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                     required
                     value={formData.category}
                     onChange={handleChange}
-                    placeholder="e.g. SaaS, E-commerce, Mobile, AI"
-                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                    placeholder="Örn: Kurumsal Web, SaaS, E-Ticaret, Mobil"
+                    className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
               </div>
 
-              {/* Description box */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="description" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                  Case Study / Value Description
+                <label
+                  htmlFor="description"
+                  className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                >
+                  Proje Açıklaması
                 </label>
                 <textarea
                   id="description"
@@ -313,15 +323,17 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Describe the scope, objectives, and commercial results delivered..."
-                  className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors resize-none"
+                  placeholder="Projenin kapsamını ve sağladığı değeri özetleyin..."
+                  className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent resize-none"
                 />
               </div>
 
-              {/* Quick Image Picker or URL Input */}
               <div className="flex flex-col gap-2">
-                <label htmlFor="imageUrl" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                  Image Path / URL
+                <label
+                  htmlFor="imageUrl"
+                  className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                >
+                  Görsel Yolu veya URL
                 </label>
                 <input
                   type="text"
@@ -330,25 +342,24 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   required
                   value={formData.imageUrl}
                   onChange={handleChange}
-                  placeholder="e.g. https://images.unsplash.com/... or /projects/ai-app.jpg"
-                  className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                  placeholder="Örn: https://... veya /projects/saas-platform.jpg"
+                  className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                 />
-                
-                {/* Pre-seeded mockup shortcuts */}
+
                 <div className="flex flex-col gap-1.5 mt-1">
-                  <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">
-                    Quick-Select Pre-Generated Mockups:
+                  <span className="text-[11px] font-mono text-ink-muted">
+                    Hazır Stüdyo Mockup Seçimi:
                   </span>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {DEFAULT_IMAGES.map((img) => (
                       <button
                         key={img.path}
                         type="button"
                         onClick={() => setFormData({ ...formData, imageUrl: img.path })}
-                        className={`p-2 rounded-xl bg-brand-dark border text-[9px] text-zinc-400 font-sans text-center transition-all ${
+                        className={`px-2.5 py-2 rounded-xl border text-[11px] font-medium text-center transition-colors cursor-pointer ${
                           formData.imageUrl === img.path
-                            ? "border-brand-cyan text-brand-cyan bg-brand-cyan/5"
-                            : "border-brand-border hover:border-brand-border-hover"
+                            ? "border-accent text-accent bg-accent-soft"
+                            : "border-line bg-surface text-ink-secondary hover:border-line-strong"
                         }`}
                       >
                         {img.label}
@@ -358,10 +369,12 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                 </div>
               </div>
 
-              {/* Tech Stack string */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="techStack" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                  Technologies Configured (Comma separated list)
+                <label
+                  htmlFor="techStack"
+                  className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                >
+                  Teknolojiler (Virgülle ayırın)
                 </label>
                 <input
                   type="text"
@@ -370,16 +383,18 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   required
                   value={formData.techStack}
                   onChange={handleChange}
-                  placeholder="e.g. Next.js, Tailwind v4, Prisma, PostgreSQL"
-                  className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                  placeholder="Next.js, TypeScript, Tailwind CSS, PostgreSQL"
+                  className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                 />
               </div>
 
-              {/* External Links */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="liveLink" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Live Demo URI (Optional)
+                  <label
+                    htmlFor="liveLink"
+                    className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                  >
+                    Canlı Site Linki (Opsiyonel)
                   </label>
                   <input
                     type="url"
@@ -387,14 +402,17 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                     name="liveLink"
                     value={formData.liveLink}
                     onChange={handleChange}
-                    placeholder="https://client-demo.com"
-                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                    placeholder="https://ornekproje.com"
+                    className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="githubLink" className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Repository URI (Optional)
+                  <label
+                    htmlFor="githubLink"
+                    className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
+                  >
+                    GitHub Linki (Opsiyonel)
                   </label>
                   <input
                     type="url"
@@ -402,36 +420,33 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                     name="githubLink"
                     value={formData.githubLink}
                     onChange={handleChange}
-                    placeholder="https://github.com/repo"
-                    className="px-4 py-2.5 rounded-xl bg-brand-dark border border-brand-border text-white text-xs font-sans focus:outline-none focus:border-brand-purple transition-colors"
+                    placeholder="https://github.com/keremclp/..."
+                    className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                   />
                 </div>
               </div>
 
-              {/* Controls */}
-              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-brand-border">
+              <div className="flex items-center gap-3 mt-3 pt-4 border-t border-line">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-grow py-3 rounded-xl bg-gradient-to-r from-brand-purple to-brand-cyan text-white text-xs font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="flex-grow py-3 rounded-full bg-ink text-background hover:bg-accent hover:text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer transition-colors"
                 >
-                  <Save size={12} />
-                  {loading ? "Saving Record..." : "Commit Changes"}
+                  <Save size={13} />
+                  {loading ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-3 rounded-xl bg-white/5 border border-brand-border text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider hover:text-foreground dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
+                  className="px-5 py-3 rounded-full border border-line bg-surface text-xs font-semibold text-ink-secondary hover:text-ink transition-colors cursor-pointer"
                 >
-                  Cancel
+                  Vazgeç
                 </button>
               </div>
-
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 }

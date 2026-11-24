@@ -1,0 +1,171 @@
+export type Locale = "tr" | "en";
+
+export interface Dictionary {
+  meta: {
+    title: string;
+    description: string;
+    siteName: string;
+  };
+  nav: {
+    home: string;
+    portfolio: string;
+    about: string;
+    contact: string;
+    cta: string;
+    adminPortal: string;
+    openMenu: string;
+    switchThemeToDark: string;
+    switchThemeToLight: string;
+    switchLangLabel: string;
+  };
+  home: {
+    badge: string;
+    heroTitleLine1: string;
+    heroTitleHighlight: string;
+    heroSubtitle: string;
+    primaryCta: string;
+    secondaryCta: string;
+    heroCardCaption: string;
+    heroMetric1Label: string;
+    heroMetric1Value: string;
+    heroMetric2Label: string;
+    heroMetric2Value: string;
+    trustPillars: { title: string; subtitle: string }[];
+    projectsEyebrow: string;
+    projectsTitle: string;
+    projectsSubtitle: string;
+    projectsViewAll: string;
+    projectInspect: string;
+    servicesEyebrow: string;
+    servicesTitle: string;
+    servicesSubtitle: string;
+    services: {
+      tag: string;
+      title: string;
+      description: string;
+      deliverables: string[];
+    }[];
+    processEyebrow: string;
+    processTitle: string;
+    processSubtitle: string;
+    processSteps: {
+      step: string;
+      title: string;
+      description: string;
+    }[];
+    standardsEyebrow: string;
+    standardsTitle: string;
+    standardsItems: {
+      title: string;
+      description: string;
+    }[];
+    ctaEyebrow: string;
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaPrimary: string;
+    ctaWhatsApp: string;
+    ctaWhatsAppPrefill: string;
+  };
+  portfolio: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    allCategory: string;
+    emptyState: string;
+    inspectLabel: string;
+    modalEyebrow: string;
+    modalOverviewTitle: string;
+    modalTechTitle: string;
+    modalLiveDemo: string;
+    modalRepo: string;
+    modalRequestSimilar: string;
+    modalClose: string;
+    modalDateLabel: string;
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaButton: string;
+  };
+  about: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    primaryCta: string;
+    secondaryCta: string;
+    principlesEyebrow: string;
+    principlesTitle: string;
+    principles: {
+      number: string;
+      title: string;
+      description: string;
+    }[];
+    leadershipEyebrow: string;
+    leadershipTitle: string;
+    founderRole: string;
+    founderBio: string;
+    founderHighlights: string[];
+    timelineEyebrow: string;
+    timelineTitle: string;
+    timeline: {
+      year: string;
+      role: string;
+      company: string;
+      description: string;
+    }[];
+    stackEyebrow: string;
+    stackTitle: string;
+    stackCategories: {
+      title: string;
+      skills: string[];
+    }[];
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaPrimary: string;
+    ctaWhatsApp: string;
+  };
+  contact: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    assurancesTitle: string;
+    assurances: string[];
+    directChannelsTitle: string;
+    emailLabel: string;
+    whatsappLabel: string;
+    locationLabel: string;
+    formTitle: string;
+    formSubtitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    emailFieldLabel: string;
+    emailPlaceholder: string;
+    categoryLabel: string;
+    categoryOptions: string[];
+    categoryOtherPlaceholder: string;
+    budgetLabel: string;
+    budgetOptions: string[];
+    messageLabel: string;
+    messagePlaceholder: string;
+    submitIdle: string;
+    submitLoading: string;
+    errorDefault: string;
+    successEyebrow: string;
+    successTitlePrefix: string;
+    successBodyPrefix: string;
+    successBodyMiddle: string;
+    successBodySuffix: string;
+    successWhatsAppCta: string;
+    successCloseCta: string;
+    whatsappPrefillTemplate: (name: string, category: string, budget: string, message: string) => string;
+  };
+  footer: {
+    tagline: string;
+    availability: string;
+    navTitle: string;
+    servicesTitle: string;
+    servicesList: string[];
+    connectTitle: string;
+    connectText: string;
+    copyright: string;
+    signature: string;
+  };
+}

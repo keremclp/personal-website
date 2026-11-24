@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kartvizit Baskı Dosyası (85×55mm) — keremcancelepkolu.com</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 32px;
+        background: #f6f7f2;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        color: #0b1f1a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      button {
+        padding: 12px 24px;
+        border-radius: 999px;
+        border: none;
+        background: #0b1f1a;
+        color: #c6f135;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14mm;
+        align-items: center;
+      }
+      .card {
+        width: 85mm;
+        height: 55mm;
+        box-shadow: 0 18px 40px rgba(11, 31, 26, 0.22);
+        border-radius: 3mm;
+        overflow: hidden;
+      }
+      .card img {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      @media print {
+        body {
+          background: #fff;
+          padding: 12mm 0;
+        }
+        .bar {
+          display: none;
+        }
+        .card {
+          box-shadow: none;
+          border-radius: 0;
+          border: 0.2mm dashed #999;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <strong>Kinetik Prizma · 85×55 mm Kartvizit Baskı Sayfası</strong>
+      <button type="button" onclick="window.print()">PDF Olarak Kaydet / Yazdır</button>
+    </div>
+    <div class="cards">
+      <div class="card"><img src="./kartvizit-on.svg" alt="Kartvizit Ön Yüz" /></div>
+      <div class="card"><img src="./kartvizit-arka.svg" alt="Kartvizit Arka Yüz" /></div>
+    </div>
+  </body>
+</html>

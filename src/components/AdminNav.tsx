@@ -1,28 +1,25 @@
-"use strict";
-
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Briefcase, Mail, LogOut, Database, Wifi } from "lucide-react";
+import { BarChart3, Briefcase, Mail, LogOut, Database, ExternalLink } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
+import BrandMark from "@/components/BrandMark";
 
-export default function AdminNav() {
+interface AdminNavProps {
+  isSupabase?: boolean;
+}
+
+export default function AdminNav({ isSupabase = true }: AdminNavProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isSupabase, setIsSupabase] = useState(false);
-
-  useEffect(() => {
-    // Simple fetch or page state mapping to check database engine
-    setIsSupabase(true); // Default visualization, fits beautifully
-  }, []);
 
   const handleLogout = async () => {
     try {
       const response = await fetch("/api/admin/auth", {
         method: "DELETE",
       });
-
       if (response.ok) {
         router.push("/admin/login");
         router.refresh();
@@ -33,57 +30,70 @@ export default function AdminNav() {
   };
 
   const navItems = [
-    { name: "Overview", path: "/admin/dashboard", icon: BarChart3 },
-    { name: "Projects CRUD", path: "/admin/projects", icon: Briefcase },
-    { name: "Lead Inbox", path: "/admin/leads", icon: Mail },
+    { name: "Genel Bakış", path: "/admin/dashboard", icon: BarChart3 },
+    { name: "Projeler", path: "/admin/projects", icon: Briefcase },
+    { name: "Teklifler", path: "/admin/leads", icon: Mail },
   ];
 
   return (
-    <div className="w-full bg-brand-deep border-b border-brand-border py-4 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
-      {/* Page Title & DB Badge */}
-      <div className="flex items-center gap-3">
-        <span className="font-mono text-sm font-bold text-foreground dark:text-white uppercase tracking-wider">
-          Console
-        </span>
-        <span className="w-1.5 h-1.5 rounded-full bg-brand-border" />
-        
-        {/* DB Engine visual indicator */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-brand-purple/10 border border-brand-purple/20 text-[10px] font-mono text-brand-purple font-medium">
-          <Database size={10} />
-          Supabase Connected
+    <header className="w-full bg-surface-elevated border-b border-line py-3.5 px-6 md:px-10">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Brand & DB Indicator */}
+        <div className="flex items-center gap-3">
+          <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+            <BrandMark size={32} className="shrink-0" />
+            <span className="font-bold text-sm text-ink tracking-tight">Yönetim Paneli</span>
+          </Link>
+
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-line text-[11px] font-mono text-ink-secondary">
+            <Database size={11} className="text-accent" />
+            {isSupabase ? "Supabase" : "Local JSON"}
+          </span>
+        </div>
+
+        {/* Tabs */}
+        <nav className="flex items-center gap-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
+                  isActive
+                    ? "bg-ink text-background"
+                    : "text-ink-secondary hover:text-ink hover:bg-surface"
+                }`}
+              >
+                <Icon size={13} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-line bg-surface text-xs font-medium text-ink-secondary hover:text-ink hover:border-line-strong transition-colors"
+          >
+            Siteyi Gör
+            <ExternalLink size={12} />
+          </Link>
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-red-500/20 bg-red-500/8 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+          >
+            <LogOut size={12} />
+            Çıkış
+          </button>
         </div>
       </div>
-
-      {/* Tabs */}
-      <nav className="flex items-center gap-2 md:gap-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.path;
-          return (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all ${
-                isActive
-                  ? "bg-white/5 border border-brand-cyan/30 text-foreground dark:text-white"
-                  : "text-zinc-400 hover:text-foreground dark:hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <Icon size={12} />
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Log out action */}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-white hover:bg-red-500/10 transition-all cursor-pointer"
-      >
-        <LogOut size={12} />
-        Exit Portal
-      </button>
-    </div>
+    </header>
   );
 }

@@ -1,223 +1,213 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, BarChart3, Briefcase, Mail, CheckCircle2, TrendingUp, DollarSign, Eye, Terminal } from "lucide-react";
+import { ArrowRight, Briefcase, Mail, CheckCircle2, Inbox, Clock } from "lucide-react";
 import { db } from "@/lib/db";
 import AdminNav from "@/components/AdminNav";
 
-// Force dynamic server rendering to reflect additions instantly
 export const revalidate = 0;
 
 export default async function AdminDashboard() {
-  // Query DB contents server-side (handles JSON fallback automatically!)
-  const projects = await db.projects.findMany();
-  const leads = await db.leads.findMany();
+  const [projects, leads] = await Promise.all([db.projects.findMany(), db.leads.findMany()]);
 
-  // Run analytic aggregates
   const totalInquiries = leads.length;
   const newInquiries = leads.filter((l) => l.status === "NEW").length;
+  const reviewedInquiries = leads.filter((l) => l.status === "REVIEWED").length;
   const totalProjects = projects.length;
 
-  // Calculate estimated total revenue pipeline from budgets (simulated mock tally)
-  const pipeLineBudget = leads.reduce((acc, lead) => {
-    if (lead.budget.includes("$10k")) return acc + 10000;
-    if (lead.budget.includes("$5k")) return acc + 7500;
-    if (lead.budget.includes("$3k")) return acc + 4000;
-    return acc + 2000;
-  }, 0);
+  // Real category distribution computed from actual DB leads
+  const categoryCounts = new Map<string, number>();
+  leads.forEach((lead) => {
+    const key = (lead.category || "Genel").trim();
+    categoryCounts.set(key, (categoryCounts.get(key) || 0) + 1);
+  });
 
-  const recentLeads = leads.slice(0, 3);
+  const categoryBreakdown = Array.from(categoryCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, count]) => ({
+      name,
+      count,
+      percent: totalInquiries > 0 ? Math.round((count / totalInquiries) * 100) : 0,
+    }));
+
+  const recentLeads = leads.slice(0, 4);
 
   return (
-    <div className="w-full flex flex-col gap-8 pb-16">
-      {/* Console Subheader Navigation */}
-      <AdminNav />
+    <div className="w-full flex flex-col gap-8 pb-16 min-h-screen bg-background">
+      <AdminNav isSupabase={db.isSupabase} />
 
-      {/* Main Console Content */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex flex-col gap-10">
-        
-        {/* Header Hook */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 w-full flex flex-col gap-10">
+        {/* Header */}
         <section className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-white">System Executive Overview</h1>
-            <p className="text-sm text-zinc-500 font-sans mt-1">
-              Live telemetry and commercial client pipeline metrics.
+            <h1 className="text-3xl font-extrabold tracking-tight text-ink">Genel Bakış</h1>
+            <p className="text-sm text-ink-secondary mt-1">
+              Canlı portfolyo ve gelen müşteri tekliflerinin özet durumu.
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-            <span>Terminal: Online</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-elevated border border-line text-xs font-mono text-ink-secondary w-fit">
+            <span className="w-2 h-2 rounded-full bg-status-ok" />
+            Sistem Aktif
           </div>
         </section>
 
         {/* Stats Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          
-          {/* Card 1: Leads */}
-          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="studio-card p-6 rounded-2xl flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-zinc-500 uppercase">Total Leads</span>
-              <Mail size={16} className="text-brand-cyan" />
-            </div>
-            <div>
-              <span className="text-3xl font-bold text-foreground dark:text-white">{totalInquiries}</span>
-              <p className="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
-                <span className="text-brand-cyan font-bold">{newInquiries}</span> new inquiries unreviewed
-              </p>
-            </div>
-          </div>
-
-          {/* Card 2: Pipe */}
-          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-zinc-500 uppercase">Revenue Pipe</span>
-              <DollarSign size={16} className="text-emerald-400" />
-            </div>
-            <div>
-              <span className="text-3xl font-bold text-foreground dark:text-white">
-                ${pipeLineBudget.toLocaleString("en-US")}
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-muted">
+                Toplam Talep
               </span>
-              <p className="text-[10px] text-zinc-400 mt-1">
-                Accumulated budget estimates
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3: Projects */}
-          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-zinc-500 uppercase">Live Projects</span>
-              <Briefcase size={16} className="text-brand-purple" />
+              <Mail size={16} className="text-accent" />
             </div>
             <div>
-              <span className="text-3xl font-bold text-foreground dark:text-white">{totalProjects}</span>
-              <p className="text-[10px] text-zinc-400 mt-1">
-                Listed in active portfolio
-              </p>
+              <span className="text-3xl font-extrabold text-ink">{totalInquiries}</span>
+              <p className="text-xs text-ink-muted mt-1">Kayıtlı tüm teklif talepleri</p>
             </div>
           </div>
 
-          {/* Card 4: Funnel Rate */}
-          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
+          <div className="studio-card p-6 rounded-2xl flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-zinc-500 uppercase">Inquiry Funnel</span>
-              <TrendingUp size={16} className="text-brand-pink" />
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-muted">
+                Yeni Talepler
+              </span>
+              <Clock size={16} className="text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <span className="text-3xl font-bold text-foreground dark:text-white">4.8%</span>
-              <p className="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
-                <span className="text-brand-pink font-bold">+1.2%</span> from last week's traffic
-              </p>
+              <span className="text-3xl font-extrabold text-ink">{newInquiries}</span>
+              <p className="text-xs text-ink-muted mt-1">İnceleme bekleyen kayıt</p>
             </div>
           </div>
 
+          <div className="studio-card p-6 rounded-2xl flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-muted">
+                İncelenenler
+              </span>
+              <CheckCircle2 size={16} className="text-status-ok" />
+            </div>
+            <div>
+              <span className="text-3xl font-extrabold text-ink">{reviewedInquiries}</span>
+              <p className="text-xs text-ink-muted mt-1">Geri dönüş sürecindeki talepler</p>
+            </div>
+          </div>
+
+          <div className="studio-card p-6 rounded-2xl flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-wider text-ink-muted">
+                Yayındaki Projeler
+              </span>
+              <Briefcase size={16} className="text-accent" />
+            </div>
+            <div>
+              <span className="text-3xl font-extrabold text-ink">{totalProjects}</span>
+              <p className="text-xs text-ink-muted mt-1">Portfolyoda sergilenen işler</p>
+            </div>
+          </div>
         </section>
 
-        {/* Funnel Graph & Recent Leads Grid */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Column 1: Conversion Analytics Mock Chart (Beautiful visual panel) */}
-          <div className="lg:col-span-7 glass-panel p-8 rounded-3xl flex flex-col gap-6">
-            <div>
-              <h3 className="text-lg font-bold text-white">Client Acquisition Performance</h3>
-              <p className="text-xs text-zinc-500 font-sans mt-0.5">
-                Conversion percentages mapped across core project categories.
-              </p>
-            </div>
-
-            {/* Simulated bar chart via premium custom CSS/Tailwind */}
-            <div className="flex flex-col gap-5 mt-4">
-              
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                  <span>SaaS Dashboards</span>
-                  <span className="text-brand-purple font-bold">58% (High Demand)</span>
-                </div>
-                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-purple rounded-full" style={{ width: "58%" }} />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                  <span>E-Commerce Storefronts</span>
-                  <span className="text-brand-cyan font-bold">24%</span>
-                </div>
-                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-cyan rounded-full" style={{ width: "24%" }} />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                  <span>Marketing Landings</span>
-                  <span className="text-brand-pink font-bold">18%</span>
-                </div>
-                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-pink rounded-full" style={{ width: "18%" }} />
-                </div>
-              </div>
-
-            </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-brand-border text-xs text-zinc-400 font-sans flex items-center gap-2 mt-2">
-              <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
-              <span>Priority: Target B2B SaaS Dashboard engineering. It holds the highest conversion yield.</span>
-            </div>
-          </div>
-
-          {/* Column 2: Recent Inbox Activity Checklist */}
-          <div className="lg:col-span-5 glass-panel p-8 rounded-3xl flex flex-col gap-6">
+        {/* Category Distribution (Real Data) & Recent Inquiries */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+          <div className="lg:col-span-6 studio-card p-7 rounded-3xl flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-white">Recent Inquiries</h3>
-                <p className="text-xs text-zinc-500 font-sans mt-0.5">
-                  Latest client proposals registered.
+                <h2 className="text-lg font-bold text-ink">Talep Kategori Dağılımı</h2>
+                <p className="text-xs text-ink-muted mt-0.5">
+                  Veritabanındaki gerçek teklif taleplerine göre hesaplanır.
+                </p>
+              </div>
+              <Link
+                href="/admin/projects"
+                className="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1"
+              >
+                Projeleri Yönet
+                <ArrowRight size={12} />
+              </Link>
+            </div>
+
+            {categoryBreakdown.length === 0 ? (
+              <div className="py-10 text-center text-sm text-ink-muted">
+                Henüz analiz edilecek teklif kaydı yok.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {categoryBreakdown.map((item) => (
+                  <div key={item.name} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-ink">{item.name}</span>
+                      <span className="font-mono text-ink-secondary">
+                        {item.count} ({item.percent}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-surface rounded-full overflow-hidden border border-line">
+                      <div
+                        className="h-full bg-accent rounded-full transition-all"
+                        style={{ width: `${item.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-6 studio-card p-7 rounded-3xl flex flex-col gap-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-ink">Son Gelen Talepler</h2>
+                <p className="text-xs text-ink-muted mt-0.5">
+                  İletişim formundan gelen en güncel başvurular.
                 </p>
               </div>
               <Link
                 href="/admin/leads"
-                className="text-xs font-mono font-bold text-brand-cyan hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1"
               >
-                Inbox
-                <ArrowRight size={10} />
+                Tümünü Gör
+                <ArrowRight size={12} />
               </Link>
             </div>
 
-            <div className="flex flex-col gap-4 mt-2">
-              {recentLeads.length === 0 ? (
-                <p className="text-xs font-mono text-zinc-600 text-center py-6">
-                  No inquiries logged in the database yet.
-                </p>
-              ) : (
-                recentLeads.map((lead) => (
-                  <div
+            {recentLeads.length === 0 ? (
+              <div className="py-10 flex flex-col items-center gap-2 text-ink-muted">
+                <Inbox size={20} />
+                <p className="text-xs">Henüz teklif talebi alınmadı.</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {recentLeads.map((lead) => (
+                  <Link
                     key={lead.id}
-                    className="p-4 rounded-xl bg-white/5 border border-brand-border hover:border-brand-border-hover transition-colors flex flex-col gap-2"
+                    href="/admin/leads"
+                    className="p-4 rounded-xl bg-surface border border-line hover:border-line-strong transition-colors flex flex-col gap-1.5"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-foreground dark:text-white">{lead.name}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-bold text-ink">{lead.name}</span>
                       <span
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        className={`text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full uppercase ${
                           lead.status === "NEW"
-                            ? "bg-brand-purple/10 text-brand-purple border border-brand-purple/20"
-                            : "bg-white/10 text-zinc-400"
+                            ? "bg-accent-soft text-accent"
+                            : lead.status === "REVIEWED"
+                            ? "bg-status-ok/12 text-status-ok"
+                            : "bg-surface-elevated text-ink-muted border border-line"
                         }`}
                       >
                         {lead.status}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-brand-cyan">{lead.category}</span>
-                    <p className="text-[11px] text-zinc-400 font-sans line-clamp-2 leading-relaxed mt-1">
-                      "{lead.message}"
+                    <div className="flex items-center justify-between text-[11px] font-mono text-ink-muted">
+                      <span className="text-accent">{lead.category}</span>
+                      <span>{lead.budget}</span>
+                    </div>
+                    <p className="text-xs text-ink-secondary line-clamp-2 leading-relaxed mt-1">
+                      {lead.message}
                     </p>
-                  </div>
-                ))
-              )}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-
         </section>
-
       </div>
     </div>
   );

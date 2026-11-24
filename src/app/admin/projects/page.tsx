@@ -3,34 +3,24 @@ import { db } from "@/lib/db";
 import ProjectsCrud from "./ProjectsCrud";
 import AdminNav from "@/components/AdminNav";
 
-// Force dynamic server rendering to reflect changes immediately
 export const revalidate = 0;
 
 export default async function AdminProjects() {
-  // Query all projects server-side (supporting offline fallback engine automatically!)
   const projects = await db.projects.findMany();
 
   return (
-    <div className="w-full flex flex-col gap-8 pb-16">
-      {/* Console Subheader Navigation */}
-      <AdminNav />
+    <div className="w-full flex flex-col gap-8 pb-16 min-h-screen bg-background">
+      <AdminNav isSupabase={db.isSupabase} />
 
-      {/* Main CRUD Portal Content */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex flex-col gap-10">
-        
-        {/* Section Header */}
-        <section className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-white">Project CRUD Manager</h1>
-            <p className="text-sm text-zinc-500 font-sans mt-1">
-              Add, update, or remove portfolio items from the public directory.
-            </p>
-          </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-10 w-full flex flex-col gap-8">
+        <section>
+          <h1 className="text-3xl font-extrabold tracking-tight text-ink">Proje Yönetimi</h1>
+          <p className="text-sm text-ink-secondary mt-1">
+            Portfolyo vitrinindeki projeleri ekleyin, güncelleyin veya görsellerini değiştirin.
+          </p>
         </section>
 
-        {/* Load dynamic client CRUD component */}
         <ProjectsCrud initialProjects={JSON.parse(JSON.stringify(projects))} />
-
       </div>
     </div>
   );

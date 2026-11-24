@@ -1,262 +1,237 @@
-"use strict";
-
 import React from "react";
 import Link from "next/link";
-import { Award, Briefcase, Calendar, Code, Cpu, GraduationCap, Layout, Sparkles } from "lucide-react";
+import type { Metadata } from "next";
+import { ArrowRight, Check, MessageSquare, Globe, Briefcase, Smartphone, Calendar } from "lucide-react";
+import { getServerLocale } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n";
+import { SITE_CONFIG, getWhatsAppUrl } from "@/lib/siteConfig";
 
-const TIMELINE = [
-  {
-    year: "2025 - Present",
-    role: "M.S. in Computer Engineering",
-    company: "Karabuk University",
-    description:
-      "Deepening academic specialization in advanced systems engineering, hardware architectures, system analysis, and advanced database integration.",
-    icon: GraduationCap,
-  },
-  {
-    year: "2024 - 2025",
-    role: "Backend Developer",
-    company: "Tatar Kaya Teknoloji",
-    description:
-      "Developed robust back-end applications using Node.js and MongoDB. Scaled message queuing architectures with RabbitMQ and managed secure storage integrations via Amazon Web Services (AWS S3).",
-    icon: Cpu,
-  },
-  {
-    year: "2023",
-    role: "Full-Stack Web Developer (Internship)",
-    company: "Truefeedback",
-    description:
-      "Utilized TypeScript and Next.js to architect highly responsive web experiences. Engineered 'PromptPulse' (an AI prompt sharing ecosystem utilizing Google Auth and MongoDB) and a dynamic server-rendered 'Car Catalog' platform.",
-    icon: Sparkles,
-  },
-  {
-    year: "2022 - Present",
-    role: "Remote Software Engineering Intern",
-    company: "University of Florida (Computer Science Dept.)",
-    description:
-      "Designing and implementing scalable RESTful APIs with Python Flask. Mapped HTTP endpoints for database query performance, implemented custom caching strategies, and optimized response pagination.",
-    icon: Code,
-  },
-  {
-    year: "2022 - 2023",
-    role: "Jr. Full-Stack Web Developer",
-    company: "BUSIWAPP",
-    description:
-      "Designed microservices communication pipelines via Python, React.js, and RabbitMQ. Developed complex relational/non-relational database schemas and optimized end-to-end data transaction flows.",
-    icon: Briefcase,
-  },
-  {
-    year: "2021 - 2025",
-    role: "B.S. in Computer Engineering",
-    company: "Karabuk University",
-    description:
-      "Graduated with a comprehensive foundation in computer engineering concepts. Actively contributed to technology and professional networks, including BTK Karabuk University and IEEE Karabuk University.",
-    icon: GraduationCap,
-  },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const dict = getDictionary(locale);
+  return {
+    title: dict.nav.about,
+    description: dict.about.subtitle,
+  };
+}
 
-const SKILL_CATEGORIES = [
-  {
-    title: "Web & Front-End",
-    icon: Code,
-    skills: ["Next.js", "React.js", "TypeScript", "JavaScript", "Tailwind CSS", "Bootstrap", "HTML/CSS"],
-  },
-  {
-    title: "Back-End & Databases",
-    icon: Cpu,
-    skills: ["Node.js / Express", "Python (Flask / Django)", "RabbitMQ / Microservices", "AWS (S3)", "MongoDB", "MySQL", "SQLite"],
-  },
-  {
-    title: "Mobile, Languages & Tools",
-    icon: Award,
-    skills: ["React Native", "Nativewind", "C# WFA (GUI)", "Java / C / C++", "Blender (3D)", "Oracle Database SQL", "English (Advanced)"],
-  },
-];
+const STACK_ICONS = [Globe, Briefcase, Smartphone];
 
-export default function About() {
+export default async function About() {
+  const locale = await getServerLocale();
+  const dict = getDictionary(locale);
+
   return (
-    <div className="max-w-7xl mx-auto px-6 md:px-12 pb-20 w-full flex flex-col gap-24 md:gap-36">
-      {/* 1. Header Intro Hero */}
-      <section className="relative pt-8 md:pt-16 flex flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-16 w-full">
-        {/* Left Column - Copy */}
-        <div className="flex flex-col gap-6 lg:max-w-[60%] w-full">
-          {/* Status Badge */}
-          
-
-          {/* Greeting & Title */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-mono text-zinc-500">Hello, I'm —</span>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-none">
-              Kerem Can <span className="bg-gradient-to-r from-brand-purple to-brand-cyan bg-clip-text text-transparent">Çelepkolu</span>
+    <div className="w-full flex flex-col">
+      {/* 1. Studio Manifesto Hero */}
+      <section className="w-full border-b border-line">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-16 md:pt-16 md:pb-24">
+          <div className="max-w-3xl flex flex-col gap-6 animate-fade-up">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+              {dict.about.eyebrow}
+            </span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.035em] leading-[1.06] text-ink">
+              {dict.about.title}
             </h1>
-          </div>
-
-          {/* Terminal / Typing Status */}
-          <div className="flex items-center gap-2 font-mono text-sm text-brand-cyan">
-            <span>$</span>
-            <span className="text-zinc-300 font-semibold">whoami</span>
-            <span className="w-1.5 h-4 bg-brand-cyan animate-pulse shrink-0" />
-          </div>
-
-          {/* Brief Description */}
-          <p className="text-base md:text-lg text-zinc-400 font-sans leading-relaxed max-w-xl">
-            I am a Computer Engineering graduate (currently pursuing my M.S.) with a passion for software innovation, system analysis, and full-stack engineering. Grounded in a strong academic foundation, I possess expertise in designing high-scale RESTful APIs, microservices with RabbitMQ, React Native mobile apps, and robust database architectures.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4 mt-2">
-            <Link
-              href="/contact"
-              className="px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-brand-purple to-brand-cyan text-white hover:opacity-90 transition-all flex items-center gap-2 group shadow-lg shadow-brand-purple/20"
-            >
-              Get in touch
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transform group-hover:translate-x-1 transition-transform"
+            <p className="text-base md:text-lg text-ink-secondary leading-relaxed">
+              {dict.about.subtitle}
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-ink text-background hover:bg-accent-lime hover:text-[#0B1F1A] text-sm font-semibold transition-colors group"
               >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </Link>
-            <Link
-              href="/portfolio"
-              className="px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase bg-white/5 border border-brand-border text-zinc-300 hover:text-brand-purple hover:border-brand-purple hover:bg-brand-purple/5 transition-all"
-            >
-              View Projects
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Column - Premium Portrait */}
-        <div className="flex-shrink-0 w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 relative flex items-center justify-center">
-          {/* Gradient Glow backdrop */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-brand-purple via-brand-cyan to-brand-pink opacity-20 blur-3xl animate-pulse" />
-          
-          {/* Outer glowing border ring */}
-          <div className="relative w-full h-full rounded-full p-1 bg-gradient-to-tr from-brand-purple to-brand-cyan shadow-xl shadow-brand-purple/10">
-            {/* Dark inner wrapper */}
-            <div className="w-full h-full rounded-full overflow-hidden border border-brand-dark/40 bg-brand-deep">
-              <img
-                src="/Kerem Can.png"
-                alt="Kerem Can Çelepkolu"
-                decoding="async"
-                className="w-full h-full object-cover rounded-full hover:scale-105 transition-transform duration-500"
-              />
+                {dict.about.primaryCta}
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href="/portfolio"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-line-strong bg-surface-elevated hover:bg-surface text-ink text-sm font-semibold transition-colors"
+              >
+                {dict.about.secondaryCta}
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Technical Expertise Grid */}
-      <section className="w-full">
-        <span className="text-xs font-mono font-bold tracking-widest text-brand-purple uppercase">
-          Technical Stack
-        </span>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-12">
-          Skills Configured for Growth
-        </h2>
+      {/* 2. Studio Principles */}
+      <section className="w-full bg-surface border-b border-line py-20 md:py-24">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-12">
+          <div>
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+              {dict.about.principlesEyebrow}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5">
+              {dict.about.principlesTitle}
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {SKILL_CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            return (
-              <div
-                key={category.title}
-                className="glass-panel p-8 rounded-3xl flex flex-col gap-6"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-purple to-brand-cyan flex items-center justify-center text-white">
-                  <Icon size={18} />
-                </div>
-                <h3 className="text-lg font-bold text-white">{category.title}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1.5 rounded-lg bg-white/5 border border-brand-border text-xs font-sans text-zinc-300 hover:border-brand-cyan transition-colors"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+            {dict.about.principles.map((item) => (
+              <div key={item.number} className="studio-card rounded-2xl p-8 flex flex-col gap-4">
+                <span className="text-xs font-mono font-semibold text-accent">{item.number}</span>
+                <h3 className="text-xl font-bold text-ink tracking-tight">{item.title}</h3>
+                <p className="text-sm text-ink-secondary leading-relaxed">{item.description}</p>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 3. Professional Journey Timeline */}
-      <section className="w-full relative">
-        <span className="text-xs font-mono font-bold tracking-widest text-brand-cyan uppercase">
-          Chronology
-        </span>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-16">
-          The Journey So Far
-        </h2>
-
-        {/* Timeline container */}
-        <div className="relative border-l border-brand-border ml-4 md:ml-8 flex flex-col gap-12 max-w-4xl">
-          {TIMELINE.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.year} className="relative pl-8 md:pl-12 group">
-                {/* Timeline node */}
-                <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-brand-dark border-2 border-brand-border flex items-center justify-center text-zinc-500 group-hover:border-brand-purple group-hover:text-brand-purple transition-all duration-300">
-                  <Icon size={14} />
+      {/* 3. Founder Leadership & Engineering Foundation */}
+      <section className="w-full py-20 md:py-28 border-b border-line">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          {/* Portrait Card (cleanly framed to crop out bottom-right corner mark while keeping authentic portrait) */}
+          <div className="lg:col-span-5">
+            <div className="studio-card rounded-3xl p-3 bg-surface-elevated max-w-md mx-auto lg:mx-0">
+              <div className="w-full aspect-[4/4.6] rounded-2xl overflow-hidden bg-surface border border-line relative">
+                <img
+                  src="/images/founder.jpg"
+                  alt={SITE_CONFIG.founderName}
+                  decoding="async"
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <div className="px-3 pt-3.5 pb-1.5 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-bold text-ink">{SITE_CONFIG.founderName}</p>
+                  <p className="text-xs text-ink-muted">{dict.about.founderRole}</p>
                 </div>
+                <span className="text-[11px] font-mono text-ink-muted">
+                  {locale === "tr" ? "Kurucu" : "Founder"}
+                </span>
+              </div>
+            </div>
+          </div>
 
-                {/* Event Card */}
-                <div className="glass-panel glass-panel-hover p-6 md:p-8 rounded-2xl flex flex-col gap-3 transition-all duration-300">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                    <span className="text-xs font-mono font-bold text-brand-cyan uppercase tracking-wider flex items-center gap-1.5">
-                      <Calendar size={12} />
-                      {item.year}
-                    </span>
-                    <span className="text-xs font-mono text-zinc-500">{item.company}</span>
+          {/* Copy */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
+            <div>
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+                {dict.about.leadershipEyebrow}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5 leading-tight">
+                {dict.about.leadershipTitle}
+              </h2>
+            </div>
+
+            <p className="text-base text-ink-secondary leading-relaxed">
+              {dict.about.founderBio}
+            </p>
+
+            <ul className="flex flex-col gap-3 pt-2">
+              {dict.about.founderHighlights.map((highlight) => (
+                <li key={highlight} className="flex items-start gap-3 text-sm text-ink">
+                  <span className="w-5 h-5 rounded-full bg-accent-soft text-accent flex items-center justify-center shrink-0 mt-0.5">
+                    <Check size={12} strokeWidth={2.5} />
+                  </span>
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Technology Stack */}
+      <section className="w-full bg-surface border-b border-line py-20 md:py-24">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-12">
+          <div>
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+              {dict.about.stackEyebrow}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5">
+              {dict.about.stackTitle}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
+            {dict.about.stackCategories.map((category, idx) => {
+              const Icon = STACK_ICONS[idx % STACK_ICONS.length];
+              return (
+                <div key={category.title} className="studio-card rounded-2xl p-7 flex flex-col gap-5">
+                  <div className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center">
+                    <Icon size={18} strokeWidth={1.8} />
                   </div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-brand-purple transition-colors">
-                    {item.role}
-                  </h3>
-                  <p className="text-xs md:text-sm text-zinc-400 font-sans leading-relaxed">
-                    {item.description}
-                  </p>
+                  <h3 className="text-lg font-bold text-ink">{category.title}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1.5 rounded-lg bg-surface border border-line text-xs font-medium text-ink-secondary"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* 4. Let's Build CTA */}
-      <section className="w-full text-center">
-        <div className="glass-panel p-10 md:p-16 rounded-3xl flex flex-col items-center gap-6 max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-4xl font-bold text-white">
-            Have a Technical Project in Mind?
-          </h2>
-          <p className="text-zinc-400 font-sans max-w-lg text-sm leading-relaxed">
-            Whether you want to launch a SaaS project, redesign a corporate platform, or establish an e-commerce funnel, I am here to engineer it.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
+      {/* 5. Academic & Industry Background */}
+      <section className="w-full py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-12">
+          <div>
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+              {dict.about.timelineEyebrow}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5">
+              {dict.about.timelineTitle}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {dict.about.timeline.map((item) => (
+              <div
+                key={`${item.year}-${item.company}`}
+                className="studio-card rounded-2xl p-7 flex flex-col gap-3"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-accent">
+                    <Calendar size={12} />
+                    {item.year}
+                  </span>
+                  <span className="text-xs font-mono text-ink-muted">{item.company}</span>
+                </div>
+                <h3 className="text-lg font-bold text-ink tracking-tight">{item.role}</h3>
+                <p className="text-sm text-ink-secondary leading-relaxed">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Closing CTA */}
+      <section className="max-w-7xl mx-auto px-6 md:px-10 pb-20 md:pb-28 w-full">
+        <div className="rounded-3xl bg-[#0B1F1A] dark:bg-surface-elevated text-white border border-line px-8 py-12 md:px-14 md:py-16 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div className="max-w-xl">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              {dict.about.ctaTitle}
+            </h2>
+            <p className="text-sm sm:text-base text-[#B6C6C0] mt-2.5 leading-relaxed">
+              {dict.about.ctaSubtitle}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
             <Link
               href="/contact"
-              className="px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-brand-purple to-brand-cyan text-white hover:opacity-90 transition-all flex items-center gap-1.5"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#C6F135] text-[#0B1F1A] hover:bg-white text-sm font-bold transition-colors"
             >
-              Consultation Form
+              {dict.about.ctaPrimary}
+              <ArrowRight size={15} />
             </Link>
             <a
-              href="https://wa.me/905317305614"
+              href={getWhatsAppUrl(dict.home.ctaWhatsAppPrefill)}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 rounded-full font-bold text-xs tracking-wider uppercase bg-white/5 border border-brand-border text-foreground hover:border-emerald-500 hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-colors"
             >
-              Direct Chat
+              <MessageSquare size={15} />
+              {dict.about.ctaWhatsApp}
             </a>
           </div>
         </div>

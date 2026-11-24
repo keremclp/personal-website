@@ -1,124 +1,87 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(html:not(.light), html:not(.light) *));
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --font-sans: 'Outfit', var(--font-geist-sans), sans-serif;
-  --font-mono: 'Space Mono', var(--font-geist-mono), monospace;
-  
-  --color-brand-dark: var(--brand-dark);
-  --color-brand-deep: var(--brand-deep);
-  --color-brand-card: var(--brand-card);
-  --color-brand-purple: #8b5cf6;
-  --color-brand-pink: #ec4899;
-  --color-brand-cyan: #06b6d4;
-  --color-brand-border: var(--brand-border);
-  --color-brand-border-hover: var(--brand-border-hover);
-  --color-brand-glass: var(--brand-glass);
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
+  --color-background: var(--bg-canvas);
+  --color-foreground: var(--text-primary);
 
-  /* Override standard zinc colors so existing templates dynamically toggle text contrast */
-  --color-zinc-300: var(--custom-zinc-300);
-  --color-zinc-400: var(--custom-zinc-400);
-  --color-zinc-500: var(--custom-zinc-500);
+  --color-surface: var(--bg-surface);
+  --color-surface-elevated: var(--bg-card);
+  --color-surface-subtle: var(--bg-subtle);
+
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+
+  --color-line: var(--border-default);
+  --color-line-strong: var(--border-strong);
+
+  --color-accent: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-lime: var(--accent-lime);
+
+  --color-status-ok: var(--status-emerald);
 }
 
 :root {
-  /* Default is DARK theme per user preference */
-  color-scheme: dark;
-  --background: #050507;
-  --foreground: #f4f4f6;
-  
-  --brand-dark: #050507;
-  --brand-deep: #0a0a0f;
-  --brand-card: #11111a;
-  --brand-border: rgba(255, 255, 255, 0.06);
-  --brand-border-hover: rgba(255, 255, 255, 0.12);
-  --brand-glass: rgba(10, 10, 15, 0.7);
-
-  /* Dark mode text levels */
-  --custom-zinc-300: #d4d4d8;
-  --custom-zinc-400: #a1a1aa;
-  --custom-zinc-500: #71717a;
-}
-
-.light {
-  /* LIGHT theme override */
   color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  
-  --brand-dark: #f8fafc;
-  --brand-deep: #f1f5f9;
-  --brand-card: #ffffff;
-  --brand-border: rgba(15, 23, 42, 0.08);
-  --brand-border-hover: rgba(15, 23, 42, 0.16);
-  --brand-glass: rgba(255, 255, 255, 0.7);
 
-  /* Light mode text levels - dark slate for rich contrast */
-  --custom-zinc-300: #475569; /* slate-600 */
-  --custom-zinc-400: #334155; /* slate-700 */
-  --custom-zinc-500: #1e293b; /* slate-800 */
-}
+  /* Kinetik Prizma — Light-First Alabaster, Deep Pine & Luminous Lime */
+  --bg-canvas: #f6f7f2;
+  --bg-surface: #ecefe5;
+  --bg-card: #ffffff;
+  --bg-subtle: #e3e7da;
 
-/* Light mode overrides for structural elements with hardcoded dark styles */
-.light h1,
-.light h2,
-.light h3,
-.light h4,
-.light h5,
-.light h6 {
-  color: var(--foreground) !important;
-}
+  --text-primary: #0b1f1a;
+  --text-secondary: #3f524c;
+  --text-muted: #5f716b;
 
-.light input,
-.light textarea,
-.light select {
-  color: var(--foreground) !important;
-  background-color: var(--brand-deep) !important;
-  border-color: var(--brand-border) !important;
+  --border-default: rgba(11, 31, 26, 0.09);
+  --border-strong: rgba(11, 31, 26, 0.18);
+
+  --accent-primary: #15803d;
+  --accent-hover: #166534;
+  --accent-soft: rgba(198, 241, 53, 0.28);
+  --accent-lime: #c6f135;
+
+  --status-emerald: #15803d;
+
+  --header-glass: rgba(246, 247, 242, 0.86);
+  --shadow-card: 0 1px 2px rgba(11, 31, 26, 0.04), 0 8px 24px -12px rgba(11, 31, 26, 0.08);
+  --shadow-card-hover: 0 4px 12px rgba(11, 31, 26, 0.06), 0 20px 40px -16px rgba(11, 31, 26, 0.14);
 }
 
-.light option {
-  background-color: var(--brand-card) !important;
-  color: var(--foreground) !important;
-}
+.dark {
+  color-scheme: dark;
 
+  /* Kinetik Prizma — Clean Matte Deep Pine Dark Mode */
+  --bg-canvas: #071411;
+  --bg-surface: #0b1f1a;
+  --bg-card: #102922;
+  --bg-subtle: #16362d;
 
+  --text-primary: #f4f6f0;
+  --text-secondary: #b6c6c0;
+  --text-muted: #849890;
 
-/* Soften light-mode transparency backgrounds */
-.light .bg-white\/5 {
-  background-color: rgba(15, 23, 42, 0.04) !important;
-}
-.light .bg-white\/10 {
-  background-color: rgba(15, 23, 42, 0.08) !important;
-}
-.light .hover\:bg-white\/10:hover {
-  background-color: rgba(15, 23, 42, 0.08) !important;
-}
-.light .border-white\/5 {
-  border-color: rgba(15, 23, 42, 0.06) !important;
-}
-.light .border-white\/10 {
-  border-color: rgba(15, 23, 42, 0.12) !important;
-}
+  --border-default: rgba(246, 247, 242, 0.09);
+  --border-strong: rgba(246, 247, 242, 0.18);
 
+  --accent-primary: #c6f135;
+  --accent-hover: #d8f864;
+  --accent-soft: rgba(198, 241, 53, 0.14);
+  --accent-lime: #c6f135;
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--brand-dark);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--brand-border-hover);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
+  --status-emerald: #34d399;
+
+  --header-glass: rgba(7, 20, 17, 0.86);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28), 0 10px 28px -12px rgba(0, 0, 0, 0.45);
+  --shadow-card-hover: 0 6px 16px rgba(0, 0, 0, 0.38), 0 22px 44px -16px rgba(0, 0, 0, 0.62);
 }
 
 html {
@@ -132,112 +95,84 @@ body {
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  position: relative;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Premium Glow Background Blobs */
-.glow-blob {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.12;
-  pointer-events: none;
-  z-index: -10;
-  animation: float 20s infinite alternate;
-  transition: opacity 0.3s ease;
+/* Subtle refined scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.light .glow-blob {
-  opacity: 0.02;
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
 }
 
-.glow-blob-purple {
-  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  top: -100px;
-  right: -100px;
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
 }
 
-.glow-blob-cyan {
-  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-  bottom: 10%;
-  left: -200px;
-  animation-delay: -5s;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
-.glow-blob-pink {
-  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
-  top: 40%;
-  right: -150px;
-  animation-delay: -10s;
+/* Architectural Studio Surfaces */
+.studio-header {
+  background-color: var(--header-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-@keyframes float {
-  0% {
-    transform: translate(0px, 0px) scale(1);
+.studio-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.studio-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Subtle architectural grid backdrop */
+.studio-grid-bg {
+  background-image:
+    linear-gradient(to right, var(--border-default) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border-default) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Clean entrance motion */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  50% {
-    transform: translate(40px, -60px) scale(1.1);
-  }
-  100% {
-    transform: translate(-20px, 20px) scale(0.9);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Custom Utilities */
-.glass-panel {
-  background: var(--brand-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--brand-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+.animate-fade-up {
+  animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.glass-panel-hover:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 0 25px rgba(139, 92, 246, 0.08);
-  transform: translateY(-2px);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #0f172a 10%, #6d28d9 60%, #0891b2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dark .text-gradient, :root:not(.light) .text-gradient {
-  background: linear-gradient(135deg, #ffffff 10%, #a78bfa 60%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-neon {
-  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Border Glow utility for ultra premium hover states */
-.border-glow {
-  position: relative;
-}
-.border-glow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  transition: background 0.3s ease;
-}
-.border-glow:hover::before {
-  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+  .studio-card-interactive:hover {
+    transform: none;
+  }
 }

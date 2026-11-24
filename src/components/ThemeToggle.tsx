@@ -1,52 +1,33 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Sun, Moon } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
 
 export default function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
-
-  useEffect(() => {
-    setMounted(true);
-    const isLight = document.documentElement.classList.contains("light");
-    setTheme(isLight ? "light" : "dark");
-  }, []);
+  const { dict } = useLocale();
 
   const toggleTheme = () => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("light");
-      localStorage.setItem("theme", "light");
-      setTheme("light");
+    const isDark = document.documentElement.classList.contains("dark");
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("studio_theme", "light");
     } else {
-      document.documentElement.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("studio_theme", "dark");
     }
   };
 
-  if (!mounted) {
-    return (
-      <div
-        className="w-9 h-9 rounded-full bg-white/5 border border-brand-border flex items-center justify-center shrink-0"
-        aria-hidden="true"
-      >
-        <span className="w-3.5 h-3.5 rounded-full bg-zinc-700 animate-pulse" />
-      </div>
-    );
-  }
-
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="w-9 h-9 rounded-full bg-white/5 border border-brand-border hover:border-brand-purple hover:bg-brand-purple/5 text-zinc-400 hover:text-brand-purple dark:hover:text-white transition-all flex items-center justify-center group shrink-0 active:scale-95 duration-200 cursor-pointer"
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      className="w-9 h-9 rounded-full border border-line bg-surface-elevated hover:border-line-strong text-ink-secondary hover:text-ink transition-all flex items-center justify-center shrink-0 active:scale-95 cursor-pointer"
+      aria-label={`${dict.nav.switchThemeToDark} / ${dict.nav.switchThemeToLight}`}
+      title={`${dict.nav.switchThemeToDark} / ${dict.nav.switchThemeToLight}`}
     >
-      {theme === "dark" ? (
-        <Sun size={15} className="text-amber-400 transition-transform group-hover:rotate-45 group-hover:scale-110 duration-300" />
-      ) : (
-        <Moon size={15} className="text-indigo-400 transition-transform group-hover:-rotate-12 group-hover:scale-110 duration-300" />
-      )}
+      <Moon size={15} strokeWidth={1.8} className="block dark:hidden" />
+      <Sun size={15} strokeWidth={1.8} className="hidden dark:block" />
     </button>
   );
 }

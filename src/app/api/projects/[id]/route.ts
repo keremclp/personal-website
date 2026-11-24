@@ -22,9 +22,10 @@ export async function PUT(request: NextRequest, { params }: Props) {
     // 3. Update entry
     const updatedProject = await db.projects.update(id, data);
     return NextResponse.json(updatedProject);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update project API:", error);
-    return NextResponse.json({ error: error.message || "Failed to update project." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to update project.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -41,8 +42,9 @@ export async function DELETE(request: NextRequest, { params }: Props) {
     // 2. Delete entry
     await db.projects.delete(id);
     return NextResponse.json({ success: true, message: "Project deleted successfully." });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to delete project API:", error);
-    return NextResponse.json({ error: error.message || "Failed to delete project." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to delete project.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -14,12 +14,22 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
+const LEGACY_IMAGE_MAP: Record<string, string> = {
+  "/projects/ai-saas.png": "/projects/saas-platform.jpg",
+  "/projects/web-app.jpg": "/projects/saas-platform.jpg",
+  "/projects/luxury-ecommerce.png": "/projects/commerce-editorial.jpg",
+  "/projects/mobile-app.jpg": "/projects/mobile-experience.jpg",
+  "/projects/creative-agency.png": "/projects/corporate-web.jpg",
+  "/projects/ai-app.jpg": "/projects/corporate-web.jpg",
+  "/next.svg": "/projects/saas-platform.jpg",
+};
+
 function fixImagePath(path: string | undefined | null): string {
-  if (!path) return "/next.svg";
+  if (!path) return "/projects/saas-platform.jpg";
   const trimmed = path.trim();
-  if (trimmed === "/projects/ai-saas.png") return "/projects/web-app.jpg";
-  if (trimmed === "/projects/luxury-ecommerce.png") return "/projects/mobile-app.jpg";
-  if (trimmed === "/projects/creative-agency.png") return "/projects/ai-app.jpg";
+  if (LEGACY_IMAGE_MAP[trimmed]) {
+    return LEGACY_IMAGE_MAP[trimmed];
+  }
   return trimmed;
 }
 
@@ -129,8 +139,8 @@ export const db = {
             where: { id },
             data: {
               ...data,
-              liveLink: data.liveLink === undefined ? undefined : (data.liveLink || null),
-              githubLink: data.githubLink === undefined ? undefined : (data.githubLink || null),
+              liveLink: data.liveLink === undefined ? undefined : data.liveLink || null,
+              githubLink: data.githubLink === undefined ? undefined : data.githubLink || null,
             },
           })) as unknown as Project;
         } catch (err) {

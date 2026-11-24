@@ -62,9 +62,10 @@ export async function PUT(request: NextRequest) {
 
     const updatedLead = await db.leads.updateStatus(id, status);
     return NextResponse.json(updatedLead);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to update lead status API:", error);
-    return NextResponse.json({ error: error.message || "Failed to update lead." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to update lead.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -85,8 +86,9 @@ export async function DELETE(request: NextRequest) {
 
     await db.leads.delete(id);
     return NextResponse.json({ success: true, message: "Inquiry record deleted successfully." });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to delete lead API:", error);
-    return NextResponse.json({ error: error.message || "Failed to delete lead." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to delete lead.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
