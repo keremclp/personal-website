@@ -20,10 +20,10 @@ interface ProjectsCrudProps {
 }
 
 const DEFAULT_IMAGES = [
-  { label: "SaaS Panel Mockup", path: "/projects/saas-platform.jpg" },
-  { label: "E-Ticaret Vitrini", path: "/projects/commerce-editorial.jpg" },
-  { label: "Mobil Uygulama", path: "/projects/mobile-experience.jpg" },
-  { label: "Kurumsal Web", path: "/projects/corporate-web.jpg" },
+  { label: "Kurumsal Web", path: "/projects/showcase-web.jpg" },
+  { label: "E-Ticaret Vitrini", path: "/projects/showcase-ecommerce.jpg" },
+  { label: "Yönetim Portalı", path: "/projects/showcase-portal.jpg" },
+  { label: "Mobil Uygulama", path: "/projects/showcase-mobile.jpg" },
 ];
 
 export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
@@ -45,7 +45,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    imageUrl: "/projects/saas-platform.jpg",
+    imageUrl: "/projects/showcase-web.jpg",
     techStack: "",
     liveLink: "",
     githubLink: "",
@@ -60,7 +60,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
     setFormData({
       title: "",
       description: "",
-      imageUrl: "/projects/saas-platform.jpg",
+      imageUrl: "/projects/showcase-web.jpg",
       techStack: "",
       liveLink: "",
       githubLink: "",
@@ -185,7 +185,7 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
             >
               <div className="w-full aspect-[16/10] relative overflow-hidden bg-surface border-b border-line">
                 <img
-                  src={project.imageUrl || "/projects/saas-platform.jpg"}
+                  src={project.imageUrl || "/projects/showcase-web.jpg"}
                   alt={project.title}
                   loading="lazy"
                   decoding="async"
@@ -328,12 +328,12 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 <label
                   htmlFor="imageUrl"
                   className="text-xs font-mono font-medium text-ink-secondary uppercase tracking-wider"
                 >
-                  Görsel Yolu veya URL
+                  Görsel Yolu veya URL (Veritabanına Doğrudan Kaydedilir)
                 </label>
                 <input
                   type="text"
@@ -342,29 +342,46 @@ export default function ProjectsCrud({ initialProjects }: ProjectsCrudProps) {
                   required
                   value={formData.imageUrl}
                   onChange={handleChange}
-                  placeholder="Örn: https://... veya /projects/saas-platform.jpg"
+                  placeholder="Örn: https://... veya /projects/showcase-web.jpg"
                   className="px-4 py-2.5 rounded-xl bg-surface border border-line text-ink text-sm focus:outline-none focus:border-accent"
                 />
 
-                <div className="flex flex-col gap-1.5 mt-1">
+                {/* Visual Thumbnail Picker */}
+                <div className="flex flex-col gap-2 mt-1">
                   <span className="text-[11px] font-mono text-ink-muted">
-                    Hazır Stüdyo Mockup Seçimi:
+                    Hazır Stüdyo Görseli Seç (Tek Tıkla DB&apos;ye Kaydet):
                   </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {DEFAULT_IMAGES.map((img) => (
-                      <button
-                        key={img.path}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, imageUrl: img.path })}
-                        className={`px-2.5 py-2 rounded-xl border text-[11px] font-medium text-center transition-colors cursor-pointer ${
-                          formData.imageUrl === img.path
-                            ? "border-accent text-accent bg-accent-soft"
-                            : "border-line bg-surface text-ink-secondary hover:border-line-strong"
-                        }`}
-                      >
-                        {img.label}
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {DEFAULT_IMAGES.map((img) => {
+                      const active = formData.imageUrl === img.path;
+                      return (
+                        <button
+                          key={img.path}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, imageUrl: img.path })}
+                          className={`rounded-xl overflow-hidden border text-left transition-all cursor-pointer bg-surface ${
+                            active
+                              ? "border-accent ring-2 ring-accent/30"
+                              : "border-line hover:border-line-strong"
+                          }`}
+                        >
+                          <div className="w-full aspect-[16/10] bg-surface-subtle overflow-hidden">
+                            <img
+                              src={img.path}
+                              alt={img.label}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div
+                            className={`px-2 py-1.5 text-[10px] font-semibold truncate ${
+                              active ? "text-accent" : "text-ink-secondary"
+                            }`}
+                          >
+                            {img.label}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

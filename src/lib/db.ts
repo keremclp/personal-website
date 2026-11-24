@@ -14,23 +14,57 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-const LEGACY_IMAGE_MAP: Record<string, string> = {
-  "/projects/ai-saas.png": "/projects/saas-platform.jpg",
-  "/projects/web-app.jpg": "/projects/saas-platform.jpg",
-  "/projects/luxury-ecommerce.png": "/projects/commerce-editorial.jpg",
-  "/projects/mobile-app.jpg": "/projects/mobile-experience.jpg",
-  "/projects/creative-agency.png": "/projects/corporate-web.jpg",
-  "/projects/ai-app.jpg": "/projects/corporate-web.jpg",
-  "/next.svg": "/projects/saas-platform.jpg",
-};
+export const STUDIO_SHOWCASE_IMAGES = [
+  "/projects/showcase-web.jpg",
+  "/projects/showcase-ecommerce.jpg",
+  "/projects/showcase-portal.jpg",
+  "/projects/showcase-mobile.jpg",
+] as const;
 
-function fixImagePath(path: string | undefined | null): string {
-  if (!path) return "/projects/saas-platform.jpg";
-  const trimmed = path.trim();
-  if (LEGACY_IMAGE_MAP[trimmed]) {
-    return LEGACY_IMAGE_MAP[trimmed];
+// Legacy placeholder paths from earlier iterations that may still exist in live Supabase rows
+const LEGACY_PLACEHOLDER_PATHS = new Set<string>([
+  "/projects/ai-saas.png",
+  "/projects/web-app.jpg",
+  "/projects/luxury-ecommerce.png",
+  "/projects/mobile-app.jpg",
+  "/projects/creative-agency.png",
+  "/projects/ai-app.jpg",
+  "/projects/saas-platform.jpg",
+  "/projects/commerce-editorial.jpg",
+  "/projects/mobile-experience.jpg",
+  "/projects/corporate-web.jpg",
+  "/next.svg",
+]);
+
+function resolveProjectImage(
+  path: string | undefined | null,
+  fallbackIndex = 0,
+  category = ""
+): string {
+  const trimmed = (path || "").trim();
+
+  // Respect any custom URL or newly chosen showcase image directly from DB
+  if (trimmed && !LEGACY_PLACEHOLDER_PATHS.has(trimmed)) {
+    return trimmed;
   }
-  return trimmed;
+
+  // If the DB record still points to an old placeholder, assign a distinct new showcase image
+  // so multiple legacy rows never display the exact same photo side-by-side
+  const lowerCat = category.toLowerCase();
+  if (fallbackIndex === -1) {
+    if (lowerCat.includes("mobil") || lowerCat.includes("mobile") || lowerCat.includes("ai")) {
+      return "/projects/showcase-mobile.jpg";
+    }
+    if (lowerCat.includes("ticaret") || lowerCat.includes("commerce")) {
+      return "/projects/showcase-ecommerce.jpg";
+    }
+    if (lowerCat.includes("saas") || lowerCat.includes("yazılım") || lowerCat.includes("panel")) {
+      return "/projects/showcase-portal.jpg";
+    }
+    return "/projects/showcase-web.jpg";
+  }
+
+  return STUDIO_SHOWCASE_IMAGES[fallbackIndex % STUDIO_SHOWCASE_IMAGES.length];
 }
 
 export const db = {
@@ -50,9 +84,9 @@ export const db = {
       } else {
         projects = await localDb.projects.findMany();
       }
-      return projects.map((p) => ({
+      return projects.map((p, index) => ({
         ...p,
-        imageUrl: fixImagePath(p.imageUrl),
+        imageUrl: resolveProjectImage(p.imageUrl, index, p.category),
       }));
     },
     findUnique: async (id: string): Promise<Project | null> => {
@@ -72,7 +106,7 @@ export const db = {
       if (project) {
         return {
           ...project,
-          imageUrl: fixImagePath(project.imageUrl),
+          imageUrl: resolveProjectImage(project.imageUrl, -1, project.category),
         };
       }
       return null;
@@ -117,7 +151,7 @@ export const db = {
       }
       return {
         ...created,
-        imageUrl: fixImagePath(created.imageUrl),
+        imageUrl: resolveProjectImage(created.imageUrl, -1, created.category),
       };
     },
     update: async (
@@ -152,7 +186,7 @@ export const db = {
       }
       return {
         ...updated,
-        imageUrl: fixImagePath(updated.imageUrl),
+        imageUrl: resolveProjectImage(updated.imageUrl, -1, updated.category),
       };
     },
     delete: async (id: string): Promise<{ success: boolean }> => {

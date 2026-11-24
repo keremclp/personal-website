@@ -1,24 +1,17 @@
 import React from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Globe,
-  Layers,
-  Smartphone,
-  MessageSquare,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, MessageSquare } from "lucide-react";
 import { db } from "@/lib/db";
 import { getServerLocale } from "@/lib/i18n/server";
 import { getDictionary } from "@/lib/i18n";
 import { getWhatsAppUrl } from "@/lib/siteConfig";
 import FeaturedProjectsGrid from "@/components/FeaturedProjectsGrid";
 import HeroShowcase from "@/components/HeroShowcase";
+import CapabilitiesBento from "@/components/CapabilitiesBento";
+import ProcessShowcase from "@/components/ProcessShowcase";
+import WhyUsBento from "@/components/WhyUsBento";
 
 export const revalidate = 0;
-
-const SERVICE_ICONS = [Globe, Layers, Smartphone];
 
 export default async function Home() {
   const [projects, locale] = await Promise.all([db.projects.findMany(), getServerLocale()]);
@@ -149,140 +142,14 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. Capabilities / Services */}
-      <section className="w-full bg-surface border-y border-line py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-14">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-xl">
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-                {dict.home.servicesEyebrow}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5 leading-tight">
-                {dict.home.servicesTitle}
-              </h2>
-            </div>
-            <p className="text-sm md:text-base text-ink-secondary max-w-md leading-relaxed">
-              {dict.home.servicesSubtitle}
-            </p>
-          </div>
+      {/* 4. Capabilities / Visual Bento */}
+      <CapabilitiesBento dict={dict} locale={locale} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
-            {dict.home.services.map((service, index) => {
-              const Icon = SERVICE_ICONS[index % SERVICE_ICONS.length];
-              return (
-                <div
-                  key={service.title}
-                  className="studio-card studio-card-interactive rounded-2xl p-8 flex flex-col gap-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-accent-soft text-accent flex items-center justify-center">
-                      <Icon size={20} strokeWidth={1.8} />
-                    </div>
-                    <span className="text-[11px] font-mono font-medium text-ink-muted">
-                      {service.tag}
-                    </span>
-                  </div>
+      {/* 5. How We Work / Interactive Process Showcase */}
+      <ProcessShowcase />
 
-                  <div>
-                    <h3 className="text-xl font-bold text-ink tracking-tight">
-                      {service.title}
-                    </h3>
-                    <p className="text-sm text-ink-secondary leading-relaxed mt-2.5">
-                      {service.description}
-                    </p>
-                  </div>
-
-                  <ul className="flex flex-col gap-2.5 mt-auto pt-5 border-t border-line text-xs text-ink-secondary">
-                    {service.deliverables.map((item) => (
-                      <li key={item} className="flex items-start gap-2.5">
-                        <Check size={14} className="text-accent shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href={`/contact?category=${encodeURIComponent(service.title)}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink hover:text-accent transition-colors pt-1 w-fit group"
-                  >
-                    {dict.nav.cta}
-                    <ArrowRight
-                      size={13}
-                      className="transition-transform group-hover:translate-x-0.5"
-                    />
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. How We Work ("Nasıl Çalışıyoruz?") */}
-      <section className="w-full py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col gap-14">
-          <div className="max-w-2xl">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              {dict.home.processEyebrow}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-ink mt-2.5 leading-tight">
-              {dict.home.processTitle}
-            </h2>
-            <p className="text-sm md:text-base text-ink-secondary mt-3 leading-relaxed">
-              {dict.home.processSubtitle}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {dict.home.processSteps.map((item) => (
-              <div
-                key={item.step}
-                className="studio-card rounded-2xl p-7 flex flex-col gap-4 relative"
-              >
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-surface border border-line font-mono text-xs font-semibold text-accent">
-                  {item.step}
-                </span>
-                <h3 className="text-lg font-bold text-ink tracking-tight">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-ink-secondary leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Why Partner With Us */}
-      <section className="w-full bg-surface border-t border-line py-20 md:py-24">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-4">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              {dict.home.standardsEyebrow}
-            </span>
-            <h2 className="text-3xl font-extrabold tracking-[-0.025em] text-ink mt-2.5 leading-tight">
-              {dict.home.standardsTitle}
-            </h2>
-          </div>
-
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {dict.home.standardsItems.map((item) => (
-              <div
-                key={item.title}
-                className="bg-surface-elevated border border-line rounded-2xl p-6 flex flex-col gap-2.5"
-              >
-                <h3 className="text-base font-bold text-ink leading-snug">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-ink-secondary leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 6. Why Partner With Us / Visual Bento Proof */}
+      <WhyUsBento dict={dict} locale={locale} />
 
       {/* 7. High-Contrast Architectural CTA */}
       <section className="w-full py-20 md:py-28">

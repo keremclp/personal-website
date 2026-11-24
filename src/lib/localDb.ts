@@ -39,7 +39,7 @@ const SEED_PROJECTS: Project[] = [
     title: "Operasyon & Analitik Yönetim Platformu",
     description:
       "Kurumsal ekiplerin gelir, proje akışı ve müşteri süreçlerini tek merkezden yönetmesi için tasarlanan modern yönetim paneli. Hızlı filtreleme, rol bazlı erişim ve sade veri sunumuyla karar alma sürecini hızlandırmak üzere geliştirildi.",
-    imageUrl: "/projects/saas-platform.jpg",
+    imageUrl: "/projects/showcase-web.jpg",
     techStack: "Web Platform, Yönetim Paneli",
     liveLink: null,
     githubLink: null,
@@ -48,10 +48,10 @@ const SEED_PROJECTS: Project[] = [
   },
   {
     id: "proj-2",
-    title: "Atelier — Tasarım & E-Ticaret Vitrini",
+    title: "Ceramica & Co. — Tasarım & E-Ticaret Vitrini",
     description:
       "Seçkin bir tasarım markası için yüksek görsel kaliteye sahip, hızlı açılan ve mobil öncelikli vitrin ile sipariş deneyimi. Güçlü ürün sunumu ve sade alışveriş akışıyla ziyaretçi güvenini ve satış dönüşümünü artırmak üzere kurgulandı.",
-    imageUrl: "/projects/commerce-editorial.jpg",
+    imageUrl: "/projects/showcase-ecommerce.jpg",
     techStack: "E-Ticaret, Marka Vitrini",
     liveLink: null,
     githubLink: null,
@@ -63,7 +63,7 @@ const SEED_PROJECTS: Project[] = [
     title: "Rezervasyon & Yaşam Tarzı Mobil Uygulaması",
     description:
       "Kullanıcıların mekan keşfi, anlık rezervasyon ve kişisel takvim yönetimini tek uygulamada yapabildiği iOS & Android mobil deneyimi. Akıcı gezinme ve sade tasarım diliyle yüksek kullanıcı memnuniyeti hedeflenerek teslim edildi.",
-    imageUrl: "/projects/mobile-experience.jpg",
+    imageUrl: "/projects/showcase-mobile.jpg",
     techStack: "Mobil Uygulama, iOS & Android",
     liveLink: null,
     githubLink: null,
@@ -72,10 +72,10 @@ const SEED_PROJECTS: Project[] = [
   },
   {
     id: "proj-4",
-    title: "Kurumsal Mimarlık & Marka Web Platformu",
+    title: "Kurumsal Yönetim & Analitik Portalı",
     description:
-      "Proje portfolyosunu uluslararası standartlarda sergilemek isteyen bir mimarlık ofisi için editoryal tasarım dili, çoklu dil yapısı ve yüksek Google görünürlüğüyle hazırlanan kurumsal web sitesi.",
-    imageUrl: "/projects/corporate-web.jpg",
+      "Büyüyen işletmelerin müşteri süreçlerini, gelir akışını ve ekip görevlerini tek merkezden yönetmesi için hazırlanan hızlı, güvenli ve sade kurumsal yazılım platformu.",
+    imageUrl: "/projects/showcase-portal.jpg",
     techStack: "Kurumsal Web, Çoklu Dil",
     liveLink: null,
     githubLink: null,

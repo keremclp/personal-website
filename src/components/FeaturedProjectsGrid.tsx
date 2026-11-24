@@ -26,7 +26,7 @@ export default function FeaturedProjectsGrid({ projects }: FeaturedProjectsGridP
             {/* Visual Preview */}
             <div className="w-full aspect-[16/10] relative overflow-hidden bg-surface border-b border-line">
               <img
-                src={project.imageUrl || "/projects/saas-platform.jpg"}
+                src={project.imageUrl || "/projects/showcase-web.jpg"}
                 alt={project.title}
                 loading="lazy"
                 decoding="async"

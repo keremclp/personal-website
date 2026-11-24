@@ -100,7 +100,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           <div className="lg:col-span-7 flex flex-col gap-5">
             <div className="w-full aspect-[16/10] rounded-2xl overflow-hidden border border-line bg-surface">
               <img
-                src={project.imageUrl || "/projects/saas-platform.jpg"}
+                src={project.imageUrl || "/projects/showcase-web.jpg"}
                 alt={project.title}
                 decoding="async"
                 className="w-full h-full object-cover"
